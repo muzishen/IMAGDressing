@@ -20,7 +20,7 @@
 ## Release
 - [2024/05/28] 🔥 We release the inference code of SD1.5 that is compatible with [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) and [ControlNet](https://github.com/lllyasviel/ControlNet).
 - [2024/05/30] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1.
-- [2024/05/08]  🔥 We launch the [project page](https://imagdressing.github.io/) IMAGDressing-v1.
+- [2024/05/08]  🔥 We launch the [project page](https://imagdressing.github.io/) of IMAGDressing-v1.
 
 ## Introduction
 
