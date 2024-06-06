@@ -41,3 +41,33 @@ pip install -U pip
 
 # Install requirements
 pip install -r requirements.txt
+```
+
+---
+## 🎉 How to Use
+
+### <span style="color:red">Important Reminder</span>
+
+
+### 1. Random faces and poses to dress the assigned clothes 
+
+```sh
+python inference.py --cloth_path [your cloth path] --model_path [your model checkpoints path]
+```
+
+
+### 2. Random faces use a given pose to dress a given outfit 
+
+```sh
+python inference.py --cloth_path [your cloth path] --model_path [your model checkpoints path]
+```
+
+### 3. Specify the face and posture to wear the specified clothes
+
+```sh
+python inference.py --cloth_path [your cloth path] --model_path [your model checkpoints path]
+```
+
+## Acknowledgement
+xxx
+
