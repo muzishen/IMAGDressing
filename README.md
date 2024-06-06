@@ -14,4 +14,4 @@ However, direct training with weak signals often leads to difficulties in conver
 To address this, we propose V-Express, a simple method that balances different control signals through a series of progressive drop operations.
 Our method gradually enables effective control by weak conditions, thereby achieving generation capabilities that simultaneously take into account pose, input image, and audio.
 
-![framework](./assets/pipeline.png)
+![framework](assets/pipeline.png)
