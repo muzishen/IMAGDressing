@@ -52,20 +52,20 @@ pip install -r requirements.txt
 ### 1. Random faces and poses to dress the assigned clothes 
 
 ```sh
-python inference.py --cloth_path [your cloth path] --model_path [your model checkpoints path]
+python inference.py --cloth_path [your cloth path]
 ```
 
 
 ### 2. Random faces use a given pose to dress a given outfit 
 
 ```sh
-python inference.py --cloth_path [your cloth path] --model_path [your model checkpoints path]
+python inference.py --cloth_path [your cloth path] --face_path [your face path]
 ```
 
 ### 3. Specify the face and posture to wear the specified clothes
 
 ```sh
-python inference.py --cloth_path [your cloth path] --model_path [your model checkpoints path]
+python inference.py --cloth_path [your cloth path] --face_path [your face path] --pose_path [your posture path]
 ```
 
 ## Acknowledgement
