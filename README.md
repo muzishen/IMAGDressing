@@ -7,7 +7,7 @@
 
 
 ### 🚀 **Key Features:**
-1. **Simple Architecture**: IMAGDressing-v1 can generate high garment fidelity and allow for user-controlled scene editings. 
+1. **Simple Architecture**: IMAGDressing-v1 produces lifelike garments and enables easy user-driven scene editing. 
 2. **Flexible Plugin Compatibility**: IMAGDressing-v1 modestly integrates with extension plugins such as [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff).
 3. **Rapid Customization**: Enables rapid customization in seconds without the need for additional LoRA training.
 
