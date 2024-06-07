@@ -1,4 +1,4 @@
-# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing** [![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)]
+# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
 ## IMAGDressing-v1: Customizable Virtual Dressing
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Technique-Report-red'></a>
