@@ -1,10 +1,10 @@
-# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
+# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing** [![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)](https://github.com/muzishen/IMAGDressing/stargazers)
 ## IMAGDressing-v1: Customizable Virtual Dressing
 
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Technique-Report-red'></a>
 <a href='https://huggingface.co/feishen29/IMAGDressing'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue'></a>
-[![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)](https://github.com/muzishen/IMAGDressing/stargazers)
+
 
 
 ### 🚀 **Key Features:**
