@@ -72,7 +72,7 @@ python inference.py --cloth_path [your cloth path] --face_path [your face path] 
 
 
 
-## Get Involved
+## 📚 Get Involved
 Join us on this exciting journey to transform virtual try-on systems. Star⭐️ our repository to stay updated with the latest advancements, and contribute to making **IMAGDressing** the leading solution for virtual clothing generation.
 
 
