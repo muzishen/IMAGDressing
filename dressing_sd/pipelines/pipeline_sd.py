@@ -11,12 +11,15 @@ from diffusers.schedulers import (
 )
 from diffusers.utils import is_accelerate_available
 from diffusers.pipelines.controlnet.pipeline_controlnet import *
-from adapter.resampler import Resampler
-import os
-from safetensors import safe_open
-from adapter.attention_processor import RefSAttnProcessor2_0, RefCAttnProcessor2_0, IPAttnProcessor2_0
 
-logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
+import os
+import sys
+from safetensors import safe_open
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
+from adapter.resampler import ProjPlusModel
+from adapter.attention_processor import RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0
 
 
 class PipIpaControlNet(StableDiffusionControlNetPipeline):
@@ -71,21 +74,17 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
             do_normalize=False,
         )
         self.ip_ckpt = ip_ckpt
-        self.num_tokens = 16
+        self.num_tokens = 4
         # image proj model
         self.image_proj_model = self.init_proj()
         self.load_ip_adapter()
 
     def init_proj(self):
-        image_proj_model = Resampler(
-            dim=self.unet.config.cross_attention_dim,
-            depth=4,
-            dim_head=64,
-            heads=12,
-            num_queries=self.num_tokens,
-            embedding_dim=self.image_encoder.config.hidden_size,
-            output_dim=self.unet.config.cross_attention_dim,
-            ff_mult=4,
+        image_proj_model = ProjPlusModel(
+            cross_attention_dim=self.unet.config.cross_attention_dim,
+            id_embeddings_dim=512,
+            clip_embeddings_dim=self.image_encoder.config.hidden_size,
+            num_tokens=self.num_tokens,
         ).to(self.unet.device, dtype=torch.float16)
         return image_proj_model
 
@@ -367,31 +366,34 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
 
         return image
 
-    def get_image_embeds(self, clip_image=None):
+    def get_image_embeds(self, clip_image=None, faceid_embeds=None):
         with torch.no_grad():
             # clip_image_embeds = self.image_encoder(clip_image.to(self.device, dtype=torch.float16)).image_embeds
             clip_image_embeds = self.image_encoder(clip_image.to(self.device, dtype=torch.float16),
                                                    output_hidden_states=True).hidden_states[-2]
-            image_prompt_embeds = self.image_proj_model(clip_image_embeds)
             uncond_clip_image_embeds = self.image_encoder(
                 torch.zeros_like(clip_image).to(self.device, dtype=torch.float16), output_hidden_states=True
             ).hidden_states[-2]
-            uncond_image_prompt_embeds = self.image_proj_model(uncond_clip_image_embeds)
+
+            faceid_embeds = faceid_embeds.to(self.device, dtype=torch.float16)
+            image_prompt_embeds = self.image_proj_model(faceid_embeds, clip_image_embeds)
+            uncond_image_prompt_embeds = self.image_proj_model(torch.zeros_like(faceid_embeds),
+                                                               uncond_clip_image_embeds)
         return image_prompt_embeds, uncond_image_prompt_embeds
 
     def set_scale(self, scale):
         for attn_processor in self.unet.attn_processors.values():
             if isinstance(attn_processor, RefSAttnProcessor2_0):
                 attn_processor.scale = scale
-            elif isinstance(attn_processor, RefCAttnProcessor2_0):
-                attn_processor.scale = scale
+            # elif isinstance(attn_processor, RefCAttnProcessor2_0):
+            #     attn_processor.scale = scale
 
     def set_ipa_scale(self, ipa_scale):
         for attn_processor in self.unet.attn_processors.values():
-            if isinstance(attn_processor, IPAttnProcessor2_0):
+            if isinstance(attn_processor, LoRAIPAttnProcessor2_0):
                 attn_processor.scale = ipa_scale
-            elif isinstance(attn_processor, IPAttnProcessor2_0):
-                attn_processor.scale = ipa_scale
+            # elif isinstance(attn_processor, IPAttnProcessor2_0):
+            #     attn_processor.scale = ipa_scale
 
     @torch.no_grad()
     def __call__(
@@ -407,6 +409,7 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
             pose_image=None,
             ref_clip_image=None,
             face_clip_image=None,
+            faceid_embeds=None,
             num_images_per_prompt=1,
             image_scale=1.0,
             ipa_scale=1.0,
@@ -428,7 +431,11 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
             **kwargs,
     ):
         self.set_scale(image_scale)
-        self.set_ipa_scale(ipa_scale)
+        if face_clip_image is None:
+            self.set_ipa_scale(ipa_scale=0.0)
+        else:
+            self.set_ipa_scale(ipa_scale)
+
         # controlnet
         controlnet = self.controlnet._orig_mod if is_compiled_module(self.controlnet) else self.controlnet
         # align format for control guidance
@@ -504,13 +511,14 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
 
         if face_clip_image is not None:
             # for face image condition
-            image_prompt_embeds, uncond_image_prompt_embeds = self.get_image_embeds(face_clip_image)
+            image_prompt_embeds, uncond_image_prompt_embeds = self.get_image_embeds(face_clip_image, faceid_embeds)
 
             bs_embed, seq_len, _ = image_prompt_embeds.shape
             image_prompt_embeds = image_prompt_embeds.repeat(1, num_samples, 1)
             image_prompt_embeds = image_prompt_embeds.view(bs_embed * num_samples, seq_len, -1)
             uncond_image_prompt_embeds = uncond_image_prompt_embeds.repeat(1, num_samples, 1)
             uncond_image_prompt_embeds = uncond_image_prompt_embeds.view(bs_embed * num_samples, seq_len, -1)
+
         if ref_clip_image is not None:
             with torch.no_grad():
                 image_embeds = self.image_encoder(ref_clip_image.to(device, dtype=prompt_embeds.dtype),
@@ -682,7 +690,7 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
                 # for no control
                 else:
                     noise_pred = self.unet(
-                        latent_model_input[0].unsqueeze(0),
+                        latent_model_input[1].unsqueeze(0),
                         t,
                         encoder_hidden_states=prompt_embeds,
                         cross_attention_kwargs={
@@ -694,7 +702,7 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
                     )[0]
                     # for negative_prompt_embeds non text
                     unc_noise_pred = self.unet(
-                        latent_model_input[1].unsqueeze(0),
+                        latent_model_input[0].unsqueeze(0),
                         t,
                         encoder_hidden_states=negative_prompt_embeds,
                         timestep_cond=timestep_cond,
@@ -730,3 +738,5 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
         do_denormalize = [True] * image.shape[0]
         image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
         return StableDiffusionPipelineOutput(images=image, nsfw_content_detected=None)
+
+

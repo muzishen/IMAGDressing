@@ -247,6 +247,40 @@ def masked_mean(t, *, dim, mask=None):
     return masked_t.sum(dim=dim) / denom.clamp(min=1e-5)
 
 
+class ProjPlusModel(torch.nn.Module):
+    def __init__(self, cross_attention_dim=768, id_embeddings_dim=512, clip_embeddings_dim=1280, num_tokens=4):
+        super().__init__()
+
+        self.cross_attention_dim = cross_attention_dim
+        self.num_tokens = num_tokens
+
+        self.proj = torch.nn.Sequential(
+            torch.nn.Linear(id_embeddings_dim, id_embeddings_dim * 2),
+            torch.nn.GELU(),
+            torch.nn.Linear(id_embeddings_dim * 2, cross_attention_dim * num_tokens),
+        )
+        self.norm = torch.nn.LayerNorm(cross_attention_dim)
+
+        self.perceiver_resampler = FacePerceiverResampler(
+            dim=cross_attention_dim,
+            depth=4,
+            dim_head=64,
+            heads=cross_attention_dim // 64,
+            embedding_dim=clip_embeddings_dim,
+            output_dim=cross_attention_dim,
+            ff_mult=4,
+        )
+
+    def forward(self, id_embeds, clip_embeds, shortcut=False, scale=1.0):
+        x = self.proj(id_embeds)
+        x = x.reshape(-1, self.num_tokens, self.cross_attention_dim)
+        x = self.norm(x)
+        out = self.perceiver_resampler(x, clip_embeds)
+        if shortcut:
+            out = x + scale * out
+        return out
+
+
 if __name__ == "__main__":
     model = PerceiverResampler(
         dim=1024,

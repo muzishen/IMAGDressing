@@ -15,10 +15,12 @@ from transformers import CLIPImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
 
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
-from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, \
-    IPAttnProcessor2_0
+from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0
 import argparse
 from adapter.resampler import Resampler
+from insightface.app import FaceAnalysis
+import cv2
+from insightface.utils import face_align
 
 
 def image_grid(imgs, rows, cols):
@@ -30,6 +32,20 @@ def image_grid(imgs, rows, cols):
     for i, img in enumerate(imgs):
         grid.paste(img, box=(i % cols * w, i // cols * h))
     return grid
+
+
+def resize_img(input_image, max_side=640, min_side=512, size=None,
+               pad_to_max_side=False, mode=Image.BILINEAR, base_pixel_number=64):
+    w, h = input_image.size
+    ratio = min_side / min(h, w)
+    w, h = round(ratio * w), round(ratio * h)
+    ratio = max_side / max(h, w)
+    input_image = input_image.resize([round(ratio * w), round(ratio * h)], mode)
+    w_resize_new = (round(ratio * w) // base_pixel_number) * base_pixel_number
+    h_resize_new = (round(ratio * h) // base_pixel_number) * base_pixel_number
+    input_image = input_image.resize([w_resize_new, h_resize_new], mode)
+
+    return input_image
 
 
 def prepare(args):
@@ -80,7 +96,10 @@ def prepare(args):
             }
             attn_procs[name].load_state_dict(weights)
         else:
-            attn_procs[name] = IPAttnProcessor2_0(hidden_size=hidden_size, cross_attention_dim=cross_attention_dim)
+            attn_procs[name] = LoRAIPAttnProcessor2_0(hidden_size=hidden_size,
+                                                      cross_attention_dim=cross_attention_dim,
+                                                      scale=1.0, rank=128,
+                                                      num_tokens=4)
 
     unet.set_attn_processor(attn_procs)
     adapter_modules = torch.nn.ModuleList(unet.attn_processors.values())
@@ -171,19 +190,29 @@ if __name__ == "__main__":
         transforms.Normalize([0.5], [0.5]),
     ])
 
-    prompt = 'A model wearing a colorful skirt'
+    app = FaceAnalysis(name="buffalo_l", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+    app.prepare(ctx_id=0, det_size=(640, 640))
+
+    # prompt = 'A model wearing a colorful skirt'
+    prompt = 'A beautiful woman, best quality, high quality'
     null_prompt = ''
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
 
     clothes_img = Image.open(args.cloth_path).convert("RGB")
+    clothes_img = resize_img(clothes_img)
     vae_clothes = img_transform(clothes_img).unsqueeze(0)
     ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
 
     if args.face_path is not None:
-        face_img = Image.open(args.face_path).convert("RGB")
-        face_img.resize((256, 256))
-        face_clip_image = clip_image_processor(images=face_img, return_tensors="pt").pixel_values
+
+        image = cv2.imread(args.face_path)
+        faces = app.get(image)
+
+        faceid_embeds = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
+        face_image = face_align.norm_crop(image, landmark=faces[0].kps, image_size=224)
+        face_clip_image = clip_image_processor(images=face_image, return_tensors="pt").pixel_values
     else:
+        faceid_embeds = None
         face_clip_image = None
 
     if args.pose_path is not None:
@@ -197,6 +226,7 @@ if __name__ == "__main__":
         ref_clip_image=ref_clip_image,
         pose_image=pose_image,
         face_clip_image=face_clip_image,
+        faceid_embeds=faceid_embeds,
         null_prompt=null_prompt,
         negative_prompt=negative_prompt,
         width=512,
@@ -204,9 +234,9 @@ if __name__ == "__main__":
         num_images_per_prompt=num_samples,
         guidance_scale=7.5,
         image_scale=1.0,
-        ipa_scale=1.2,
+        ipa_scale=1.0,
         generator=generator,
-        num_inference_steps=30,
+        num_inference_steps=50,
     ).images
 
     save_output = []
@@ -215,4 +245,4 @@ if __name__ == "__main__":
 
     grid = image_grid(save_output, 1, 2)
     grid.save(
-        output_path + '/' + args.clothes_path.split("/")[-1])
+        output_path + '/' + args.cloth_path.split("/")[-1])
