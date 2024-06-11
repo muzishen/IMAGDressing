@@ -82,5 +82,5 @@ Join us on this exciting journey to transform virtual try-on systems. Star⭐️
 
 
 ## Acknowledgement
-xxx
+We would like to thank the contributors to the [MagicClothing](https://github.com/ShineChen1024/MagicClothing),[IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff) repositories, for their open research and exploration.
 
