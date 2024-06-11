@@ -51,6 +51,13 @@ pip install -r requirements.txt
 ```
 
 ---
+
+
+## 🌐 Download Models
+You can download models from [here](https://huggingface.co/feishen29/IMAGDressing). We have included all the required models in the model card. You can also download the models separately from the original repository.
+- [stabilityai/sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse).
+- [SG161222/Realistic_Vision_V4.0_noVAE](https://huggingface.co/SG161222/Realistic_Vision_V4.0_noVAE).
+
 ## 🎉 How to Use
 
 ### <span style="color:red">Important Reminder</span>
@@ -84,3 +91,4 @@ Join us on this exciting journey to transform virtual try-on systems. Star⭐️
 ## Acknowledgement
 We would like to thank the contributors to the [MagicClothing](https://github.com/ShineChen1024/MagicClothing),[IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff) repositories, for their open research and exploration.
 
+The IMAGDressing code is available for both academic and commercial use. However, the models available for manual and automatic download from IMAGDressing are intended solely for non-commercial research purposes. Similarly, our released checkpoints are restricted to research use only. Users are free to create videos using this tool, but they must adhere to local laws and use it responsibly. The developers disclaim any liability for potential misuse by users.
