@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/5/31
-# @Author  : White Jiang
 from diffusers.schedulers import (
     DDIMScheduler,
     DPMSolverMultistepScheduler,
