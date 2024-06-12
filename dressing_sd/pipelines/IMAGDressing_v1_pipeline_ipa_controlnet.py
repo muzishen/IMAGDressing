@@ -19,10 +19,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
 from adapter.resampler import ProjPlusModel
-from adapter.attention_processor import RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0
+from adapter.attention_processor import RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0, IPAttnProcessor2_0
 
 
-class PipIpaControlNet(StableDiffusionControlNetPipeline):
+class IMAGDressing_v1(StableDiffusionControlNetPipeline):
     _optional_components = []
 
     def __init__(
@@ -368,7 +368,6 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
 
     def get_image_embeds(self, clip_image=None, faceid_embeds=None):
         with torch.no_grad():
-            # clip_image_embeds = self.image_encoder(clip_image.to(self.device, dtype=torch.float16)).image_embeds
             clip_image_embeds = self.image_encoder(clip_image.to(self.device, dtype=torch.float16),
                                                    output_hidden_states=True).hidden_states[-2]
             uncond_clip_image_embeds = self.image_encoder(
@@ -377,23 +376,25 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
 
             faceid_embeds = faceid_embeds.to(self.device, dtype=torch.float16)
             image_prompt_embeds = self.image_proj_model(faceid_embeds, clip_image_embeds)
-            uncond_image_prompt_embeds = self.image_proj_model(torch.zeros_like(faceid_embeds),
-                                                               uncond_clip_image_embeds)
+            uncond_image_prompt_embeds = self.image_proj_model(torch.zeros_like(faceid_embeds),uncond_clip_image_embeds)
         return image_prompt_embeds, uncond_image_prompt_embeds
 
-    def set_scale(self, scale):
+    def set_scale(self, scale, lora_scale):
         for attn_processor in self.unet.attn_processors.values():
             if isinstance(attn_processor, RefSAttnProcessor2_0):
                 attn_processor.scale = scale
+                attn_processor.lora_scale = lora_scale
             # elif isinstance(attn_processor, RefCAttnProcessor2_0):
             #     attn_processor.scale = scale
 
-    def set_ipa_scale(self, ipa_scale):
+    def set_ipa_scale(self, ipa_scale, lora_scale):
         for attn_processor in self.unet.attn_processors.values():
             if isinstance(attn_processor, LoRAIPAttnProcessor2_0):
                 attn_processor.scale = ipa_scale
-            # elif isinstance(attn_processor, IPAttnProcessor2_0):
-            #     attn_processor.scale = ipa_scale
+                attn_processor.lora_scale = lora_scale  
+            elif isinstance(attn_processor, IPAttnProcessor2_0):
+                attn_processor.scale = ipa_scale
+                attn_processor.lora_scale = lora_scale
 
     @torch.no_grad()
     def __call__(
@@ -412,7 +413,9 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
             faceid_embeds=None,
             num_images_per_prompt=1,
             image_scale=1.0,
-            ipa_scale=1.0,
+            ipa_scale=0.0,
+            s_lora_scale=0.0,
+            c_lora_scale=0.0,
             num_samples=1,
             eta: float = 0.0,
             generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
@@ -430,11 +433,13 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
             control_guidance_end: Union[float, List[float]] = 1.0,
             **kwargs,
     ):
-        self.set_scale(image_scale)
+        
         if face_clip_image is None:
-            self.set_ipa_scale(ipa_scale=0.0)
+            self.set_scale(image_scale, lora_scale=0.0)
+            self.set_ipa_scale(ipa_scale=0.0, lora_scale=0.0)
         else:
-            self.set_ipa_scale(ipa_scale)
+            self.set_scale(image_scale, lora_scale=s_lora_scale)
+            self.set_ipa_scale(ipa_scale, lora_scale=c_lora_scale)
 
         # controlnet
         controlnet = self.controlnet._orig_mod if is_compiled_module(self.controlnet) else self.controlnet
@@ -528,6 +533,7 @@ class PipIpaControlNet(StableDiffusionControlNetPipeline):
                                        output_hidden_states=True).hidden_states[-2]
                 cloth_proj_embed = self.ImgProj(image_embeds)
                 cloth_null_embeds = self.ImgProj(image_null_embeds)
+                # cloth_null_embeds = self.ImgProj(torch.zeros_like(image_embeds))
         else:
             null_prompt_embeds, _ = self.encode_prompt(
                 null_prompt,

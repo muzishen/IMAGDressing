@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/5/8
-# @Author  : White Jiang
-
 import diffusers
-from dressing_sd.pipelines.pipeline_sd import PipIpaControlNet
+from dressing_sd.pipelines.IMAGDressing_v1_pipeline_ipa_controlnet import IMAGDressing_v1
 import os
 import torch
 
@@ -15,7 +11,7 @@ from transformers import CLIPImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
 
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
-from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0
+from adapter.attention_processor import CacheAttnProcessor2_0, LoraRefSAttnProcessor2_0, LoRAIPAttnProcessor2_0
 import argparse
 from adapter.resampler import Resampler
 from insightface.app import FaceAnalysis
@@ -88,23 +84,16 @@ def prepare(args):
             hidden_size = unet.config.block_out_channels[block_id]
         # lora_rank = hidden_size // 2 # args.lora_rank
         if cross_attention_dim is None:
-            attn_procs[name] = RefSAttnProcessor2_0(name, hidden_size)
-            layer_name = name.split(".processor")[0]
-            weights = {
-                "to_k_ref.weight": st[layer_name + ".to_k.weight"],
-                "to_v_ref.weight": st[layer_name + ".to_v.weight"],
-            }
-            attn_procs[name].load_state_dict(weights)
+            attn_procs[name] = LoraRefSAttnProcessor2_0(name, hidden_size)
         else:
-            attn_procs[name] = LoRAIPAttnProcessor2_0(hidden_size=hidden_size,
-                                                      cross_attention_dim=cross_attention_dim,
-                                                      scale=1.0, rank=128,
-                                                      num_tokens=4)
+            attn_procs[name] = LoRAIPAttnProcessor2_0(hidden_size=hidden_size, cross_attention_dim=cross_attention_dim)
 
     unet.set_attn_processor(attn_procs)
     adapter_modules = torch.nn.ModuleList(unet.attn_processors.values())
     adapter_modules = adapter_modules.to(dtype=torch.float16, device=args.device)
     del st
+
+
 
     ref_unet = UNet2DConditionModel.from_pretrained("SG161222/Realistic_Vision_V4.0_noVAE", subfolder="unet").to(
         dtype=torch.float16,
@@ -147,7 +136,7 @@ def prepare(args):
 
     control_net_openpose = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_openpose",
                                                            torch_dtype=torch.float16).to(device=args.device)
-    pipe = PipIpaControlNet(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
+    pipe = IMAGDressing_v1(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
                             text_encoder=text_encoder, image_encoder=image_encoder,
                             ip_ckpt=args.ip_ckpt,
                             ImgProj=image_proj, controlnet=control_net_openpose,
@@ -193,8 +182,9 @@ if __name__ == "__main__":
     app = FaceAnalysis(name="buffalo_l", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
     app.prepare(ctx_id=0, det_size=(640, 640))
 
-    # prompt = 'A model wearing a colorful skirt'
-    prompt = 'A beautiful woman, best quality, high quality'
+
+    prompt = 'A beautiful woman'
+    prompt = prompt + ', best quality, high quality'
     null_prompt = ''
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
 
@@ -232,9 +222,11 @@ if __name__ == "__main__":
         width=512,
         height=640,
         num_images_per_prompt=num_samples,
-        guidance_scale=7.5,
-        image_scale=1.0,
-        ipa_scale=1.0,
+        guidance_scale=7.0,
+        image_scale=0.9,
+        ipa_scale=0.9,
+        s_lora_scale= 0.2,
+        c_lora_scale= 0.2,
         generator=generator,
         num_inference_steps=50,
     ).images
