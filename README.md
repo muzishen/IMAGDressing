@@ -67,7 +67,7 @@ You can download models from [here](https://huggingface.co/feishen29/IMAGDressin
 ### 1. Random faces and poses to dress the assigned clothes 
 
 ```sh
-python inference.py --cloth_path [your cloth path]
+python inference_base.py --cloth_path [your cloth path]
 ```
 
 
