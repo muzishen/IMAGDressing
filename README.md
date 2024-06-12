@@ -25,6 +25,7 @@
 
 ## 🔥 **Examples**
 
+![compare](assets/compare_magic.png)
 
 
 
