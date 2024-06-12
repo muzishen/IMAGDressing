@@ -74,7 +74,7 @@ python inference_base.py --cloth_path [your cloth path]
 ### 2. Random faces use a given pose to dress a given outfit 
 
 ```sh
-python inference.py --cloth_path [your cloth path] --face_path [your face path]
+python inference_control.py --cloth_path [your cloth path] --pose_path [your posture path]
 ```
 
 ### 3. Specify the face and posture to wear the specified clothes

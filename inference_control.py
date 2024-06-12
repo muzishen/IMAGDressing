@@ -1,20 +1,36 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2024/6/12
 # @Author  : White Jiang
-from dressing_sd.pipelines.pipline_w_RefAdapter import PipRefAdapter
+
+import diffusers
+from dressing_sd.pipelines.pipline_w_RefAdapter_Control import PipControlNet
 import os
+import sys
 import torch
 
 from PIL import Image
-from diffusers import UNet2DConditionModel, AutoencoderKL, DDIMScheduler
+from diffusers import ControlNetModel, UNet2DConditionModel, \
+    AutoencoderKL, DDIMScheduler
 from torchvision import transforms
 from transformers import CLIPImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
 
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
+
 from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, CAttnProcessor2_0
 import argparse
 from adapter.resampler import Resampler
+
+
+def image_grid(imgs, rows, cols):
+    assert len(imgs) == rows * cols
+    w, h = imgs[0].size
+    grid = Image.new("RGB", size=(cols * w, rows * h))
+    grid_w, grid_h = grid.size
+
+    for i, img in enumerate(imgs):
+        grid.paste(img, box=(i % cols * w, i // cols * h))
+    return grid
 
 
 def resize_img(input_image, max_side=640, min_side=512, size=None,
@@ -29,17 +45,6 @@ def resize_img(input_image, max_side=640, min_side=512, size=None,
     input_image = input_image.resize([w_resize_new, h_resize_new], mode)
 
     return input_image
-
-
-def image_grid(imgs, rows, cols):
-    assert len(imgs) == rows * cols
-    w, h = imgs[0].size
-    grid = Image.new("RGB", size=(cols * w, rows * h))
-    grid_w, grid_h = grid.size
-
-    for i, img in enumerate(imgs):
-        grid.paste(img, box=(i % cols * w, i // cols * h))
-    return grid
 
 
 def prepare(args):
@@ -103,6 +108,8 @@ def prepare(args):
         device=args.device)
     ref_unet.set_attn_processor(
         {name: CacheAttnProcessor2_0() for name in ref_unet.attn_processors.keys()})  # set cache
+    ref_unet.set_attn_processor(
+        {name: CacheAttnProcessor2_0() for name in ref_unet.attn_processors.keys()})  # set cache
 
     # weights load
     model_sd = torch.load(args.model_ckpt, map_location="cpu")["module"]
@@ -118,14 +125,14 @@ def prepare(args):
             unet_dict[k.replace("unet.", "")] = model_sd[k]
         elif k.startswith("proj"):
             image_proj_dict[k.replace("proj.", "")] = model_sd[k]
-        elif k.startswith("adapter_modules"):
+        elif k.startswith("adapter_modules") and 'ref' in k:
             adapter_modules_dict[k.replace("adapter_modules.", "")] = model_sd[k]
         else:
             print(k)
 
     ref_unet.load_state_dict(ref_unet_dict)
     image_proj.load_state_dict(image_proj_dict)
-    adapter_modules.load_state_dict(adapter_modules_dict)
+    adapter_modules.load_state_dict(adapter_modules_dict, strict=False)
 
     noise_scheduler = DDIMScheduler(
         num_train_timesteps=1000,
@@ -137,22 +144,26 @@ def prepare(args):
         steps_offset=1,
     )
 
-    pipe = PipRefAdapter(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
-                         text_encoder=text_encoder, image_encoder=image_encoder,
-                         ImgProj=image_proj,
-                         scheduler=noise_scheduler,
+    control_net_openpose = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_openpose",
+                                                           torch_dtype=torch.float16).to(device=args.device)
+    pipe = PipControlNet(vae=vae, reference_unet=ref_unet, unet=unet, tokenizer=tokenizer,
+                         text_encoder=text_encoder, controlnet=control_net_openpose, image_encoder=image_encoder,
+                         ImgProj=image_proj, scheduler=noise_scheduler,
                          safety_checker=StableDiffusionSafetyChecker,
                          feature_extractor=CLIPImageProcessor)
+
     return pipe, generator
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='ReferenceAdapter diffusion')
+
     parser.add_argument('--model_ckpt',
                         default="path/to/model.ckpt",
                         type=str)
     parser.add_argument('--cloth_path', type=str, required=True)
-    parser.add_argument('--output_path', type=str, default="./output_sd_base")
+    parser.add_argument('--pose_path', type=str, required=True)
+    parser.add_argument('--output_path', type=str, default="./output_sd_control")
     parser.add_argument('--device', type=str, default="cuda:0")
     args = parser.parse_args()
 
@@ -174,7 +185,8 @@ if __name__ == "__main__":
         transforms.Normalize([0.5], [0.5]),
     ])
 
-    prompt = 'A beautiful woman, best quality, high quality'
+    prompt = 'A beautiful woman'
+    prompt = prompt + ', best quality, high quality'
     null_prompt = ''
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
 
@@ -183,10 +195,13 @@ if __name__ == "__main__":
     vae_clothes = img_transform(clothes_img).unsqueeze(0)
     ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
 
+    pose_image = diffusers.utils.load_image(args.pose_path)
+
     output = pipe(
         ref_image=vae_clothes,
         prompt=prompt,
         ref_clip_image=ref_clip_image,
+        pose_image=pose_image,
         null_prompt=null_prompt,
         negative_prompt=negative_prompt,
         width=512,
