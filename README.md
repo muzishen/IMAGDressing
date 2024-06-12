@@ -2,8 +2,8 @@
 
 
 ## 📦️ Release
-- [2024/05/28] 🔥 We release the inference code of SD1.5 that is compatible with [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) and [ControlNet](https://github.com/lllyasviel/ControlNet).
 - [2024/05/30] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1.
+- [2024/05/28] 🔥 We release the inference code of SD1.5 that is compatible with [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) and [ControlNet](https://github.com/lllyasviel/ControlNet).
 - [2024/05/08]  🔥 We launch the [project page](https://imagdressing.github.io/) of IMAGDressing-v1.
 
 ---
@@ -12,7 +12,7 @@
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Technique-Report-red'></a>
 <a href='https://huggingface.co/feishen29/IMAGDressing'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue'></a>
-[![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)](https://github.com/muzishen/IMAGDressing/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)](https://github.com/muzishen/IMAGDressing)
 
 
 ### 🚀 **Key Features:**
@@ -52,6 +52,13 @@ pip install -r requirements.txt
 ```
 
 ---
+
+
+## 🌐 Download Models
+You can download models from [here](https://huggingface.co/feishen29/IMAGDressing). We have included all the required models in the model card. You can also download the models separately from the original repository.
+- [stabilityai/sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse).
+- [SG161222/Realistic_Vision_V4.0_noVAE](https://huggingface.co/SG161222/Realistic_Vision_V4.0_noVAE).
+
 ## 🎉 How to Use
 
 ### <span style="color:red">Important Reminder</span>
@@ -83,5 +90,6 @@ Join us on this exciting journey to transform virtual try-on systems. Star⭐️
 
 
 ## Acknowledgement
-xxx
+We would like to thank the contributors to the [IDM-VTON](https://github.com/yisol/IDM-VTON), [MagicClothing](https://github.com/ShineChen1024/MagicClothing), [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff) repositories, for their open research and exploration.
 
+The IMAGDressing code is available for both academic and commercial use. However, the models available for manual and automatic download from IMAGDressing are intended solely for non-commercial research purposes. Similarly, our released checkpoints are restricted to research use only. Users are free to create videos using this tool, but they must adhere to local laws and use it responsibly. The developers disclaim any liability for potential misuse by users.
