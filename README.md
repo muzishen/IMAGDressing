@@ -74,13 +74,13 @@ python inference_IMAGdressing.py --cloth_path [your cloth path]
 ### 2. Random faces use a given pose to dress a given outfit 
 
 ```sh
-python inference_IMAGdressing_controlnet.py --cloth_path [your cloth path] --pose_path [your posture path]
+python inference_IMAGdressing_controlnetpose.py --cloth_path [your cloth path] --pose_path [your posture path]
 ```
 
 ### 3. Specify the face and posture to wear the specified clothes
 
 ```sh
-python inference_IMAGdressing_ipa_controlnet.py --cloth_path [your cloth path] --face_path [your face path] --pose_path [your posture path]
+python inference_IMAGdressing_ipa_controlnetpose.py --cloth_path [your cloth path] --face_path [your face path] --pose_path [your posture path]
 ```
 
 
