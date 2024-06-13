@@ -1,4 +1,4 @@
-# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
+![图片](https://github.com/muzishen/IMAGDressing/assets/36322670/95f98978-6018-4e44-9375-48cf03aa2a2f)# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
 
 
 ## 📦️ Release
@@ -58,7 +58,8 @@ pip install -r requirements.txt
 You can download our models from [here](https://huggingface.co/feishen29/IMAGDressing).  You can download the other component models from the original repository, as follows.
 - [stabilityai/sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse).
 - [SG161222/Realistic_Vision_V4.0_noVAE](https://huggingface.co/SG161222/Realistic_Vision_V4.0_noVAE).
-
+- [h94/IP-Adapter-FaceID](https://huggingface.co/h94/IP-Adapter-FaceID).
+- [lllyasviel/control_v11p_sd15_openpose](https://huggingface.co/lllyasviel/control_v11p_sd15_openpose).
 ## 🎉 How to Use
 
 ### <span style="color:red">Important Reminder</span>
