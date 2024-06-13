@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/6/12
-# @Author  : White Jiang
 from dressing_sd.pipelines.IMAGDressing_v1_pipeline import IMAGDressing_v1
 import os
 import torch
