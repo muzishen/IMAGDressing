@@ -55,7 +55,7 @@ pip install -r requirements.txt
 
 
 ## 🌐 Download Models
-You can download models from [here](https://huggingface.co/feishen29/IMAGDressing). We have included all the required models in the model card. You can also download the models separately from the original repository.
+You can download our models from [here](https://huggingface.co/feishen29/IMAGDressing).  You can download the other component models from the original repository, as follows.
 - [stabilityai/sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse).
 - [SG161222/Realistic_Vision_V4.0_noVAE](https://huggingface.co/SG161222/Realistic_Vision_V4.0_noVAE).
 
