@@ -2,7 +2,7 @@
 
 
 ## 📦️ Release
-- [2024/05/30] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1.
+- [2024/06/13] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1.
 - [2024/05/28] 🔥 We release the inference code of SD1.5 that is compatible with [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) and [ControlNet](https://github.com/lllyasviel/ControlNet).
 - [2024/05/08]  🔥 We launch the [project page](https://imagdressing.github.io/) of IMAGDressing-v1.
 
@@ -93,3 +93,17 @@ Join us on this exciting journey to transform virtual try-on systems. Star⭐️
 We would like to thank the contributors to the [IDM-VTON](https://github.com/yisol/IDM-VTON), [MagicClothing](https://github.com/ShineChen1024/MagicClothing), [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff) repositories, for their open research and exploration.
 
 The IMAGDressing code is available for both academic and commercial use. However, the models available for manual and automatic download from IMAGDressing are intended solely for non-commercial research purposes. Similarly, our released checkpoints are restricted to research use only. Users are free to create images using this tool, but they must adhere to local laws and use it responsibly. The developers disclaim any liability for potential misuse by users.
+
+## Citation
+
+If you find IMAGDressing-v1 useful for your research and applications, please cite using this BibTeX:
+
+```bibtex
+@article{shen2024IMAGDressing-v1,
+  title={IMAGDressing-v1: Customizable Virtual Dressing},
+  author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Zhang, Jun, and Du, Xiaoyu, and Tang, Jinghui},
+  booktitle={Coming Soon},
+  year={2024}
+}
+```
+
