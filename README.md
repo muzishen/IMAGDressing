@@ -94,5 +94,16 @@ We would like to thank the contributors to the [IDM-VTON](https://github.com/yis
 
 The IMAGDressing code is available for both academic and commercial use. However, the models available for manual and automatic download from IMAGDressing are intended solely for non-commercial research purposes. Similarly, our released checkpoints are restricted to research use only. Users are free to create images using this tool, but they must adhere to local laws and use it responsibly. The developers disclaim any liability for potential misuse by users.
 
+## Citation
 
+If you find IMAGDressing-v1 useful for your research and applications, please cite using this BibTeX:
+
+```bibtex
+@article{shen2024IMAGDressing-v1,
+  title={IMAGDressing-v1: Customizable Virtual Dressing},
+  author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Zhang, Jun, and Du, Xiaoyu, and Tang, Jinghui},
+  booktitle={Coming Soon},
+  year={2024}
+}
+```
 
