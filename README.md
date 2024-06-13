@@ -1,4 +1,4 @@
-![图片](https://github.com/muzishen/IMAGDressing/assets/36322670/95f98978-6018-4e44-9375-48cf03aa2a2f)# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
+# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
 
 
 ## 📦️ Release
