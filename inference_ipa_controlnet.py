@@ -147,7 +147,7 @@ def prepare(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='ReferenceAdapter diffusion')
+    parser = argparse.ArgumentParser(description='IMAGDressing_v1')
     parser.add_argument('--ip_ckpt',
                         default="path/to/IP-Adapter/ip-adapter-plus-face_sd15.bin",
                         type=str)

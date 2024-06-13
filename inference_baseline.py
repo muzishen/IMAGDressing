@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2024/6/12
 # @Author  : White Jiang
-from dressing_sd.pipelines.pipline_w_RefAdapter import PipRefAdapter
+from dressing_sd.pipelines.IMAGDressing_v1_pipeline import IMAGDressing_v1
 import os
 import torch
 
@@ -80,21 +80,13 @@ def prepare(args):
         elif name.startswith("down_blocks"):
             block_id = int(name[len("down_blocks.")])
             hidden_size = unet.config.block_out_channels[block_id]
-        # lora_rank = hidden_size // 2 # args.lora_rank
         if cross_attention_dim is None:
             attn_procs[name] = RefSAttnProcessor2_0(name, hidden_size)
-            layer_name = name.split(".processor")[0]
-            weights = {
-                "to_k_ref.weight": st[layer_name + ".to_k.weight"],
-                "to_v_ref.weight": st[layer_name + ".to_v.weight"],
-            }
-            attn_procs[name].load_state_dict(weights)
         else:
             attn_procs[name] = CAttnProcessor2_0(name, hidden_size=hidden_size, cross_attention_dim=cross_attention_dim)
 
     unet.set_attn_processor(attn_procs)
     adapter_modules = torch.nn.ModuleList(unet.attn_processors.values())
-    # adapter_modules = torch.nn.ModuleList(adapter_modules_list)
     adapter_modules = adapter_modules.to(dtype=torch.float16, device=args.device)
     del st
 
@@ -137,7 +129,7 @@ def prepare(args):
         steps_offset=1,
     )
 
-    pipe = PipRefAdapter(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
+    pipe = IMAGDressing_v1(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
                          text_encoder=text_encoder, image_encoder=image_encoder,
                          ImgProj=image_proj,
                          scheduler=noise_scheduler,
@@ -147,7 +139,7 @@ def prepare(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='ReferenceAdapter diffusion')
+    parser = argparse.ArgumentParser(description='IMAGDressing_v1')
     parser.add_argument('--model_ckpt',
                         default="path/to/model.ckpt",
                         type=str)
@@ -174,7 +166,8 @@ if __name__ == "__main__":
         transforms.Normalize([0.5], [0.5]),
     ])
 
-    prompt = 'A beautiful woman, best quality, high quality'
+    prompt = 'A beautiful woman'
+    prompt = prompt + ', best quality, high quality'
     null_prompt = ''
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
 

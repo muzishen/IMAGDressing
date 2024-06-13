@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/6/12
-# @Author  : White Jiang
-
 import diffusers
-from dressing_sd.pipelines.pipline_w_RefAdapter_Control import PipControlNet
+from dressing_sd.pipelines.IMAGDressing_v1_pipeline_controlnet import IMAGDressing_v1
 import os
 import sys
 import torch
@@ -85,21 +81,13 @@ def prepare(args):
         elif name.startswith("down_blocks"):
             block_id = int(name[len("down_blocks.")])
             hidden_size = unet.config.block_out_channels[block_id]
-        # lora_rank = hidden_size // 2 # args.lora_rank
         if cross_attention_dim is None:
             attn_procs[name] = RefSAttnProcessor2_0(name, hidden_size)
-            layer_name = name.split(".processor")[0]
-            weights = {
-                "to_k_ref.weight": st[layer_name + ".to_k.weight"],
-                "to_v_ref.weight": st[layer_name + ".to_v.weight"],
-            }
-            attn_procs[name].load_state_dict(weights)
         else:
             attn_procs[name] = CAttnProcessor2_0(name, hidden_size=hidden_size, cross_attention_dim=cross_attention_dim)
 
     unet.set_attn_processor(attn_procs)
     adapter_modules = torch.nn.ModuleList(unet.attn_processors.values())
-    # adapter_modules = torch.nn.ModuleList(adapter_modules_list)
     adapter_modules = adapter_modules.to(dtype=torch.float16, device=args.device)
     del st
 
@@ -146,7 +134,7 @@ def prepare(args):
 
     control_net_openpose = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_openpose",
                                                            torch_dtype=torch.float16).to(device=args.device)
-    pipe = PipControlNet(vae=vae, reference_unet=ref_unet, unet=unet, tokenizer=tokenizer,
+    pipe = IMAGDressing_v1(vae=vae, reference_unet=ref_unet, unet=unet, tokenizer=tokenizer,
                          text_encoder=text_encoder, controlnet=control_net_openpose, image_encoder=image_encoder,
                          ImgProj=image_proj, scheduler=noise_scheduler,
                          safety_checker=StableDiffusionSafetyChecker,
@@ -156,7 +144,7 @@ def prepare(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='ReferenceAdapter diffusion')
+    parser = argparse.ArgumentParser(description='IMAGDressing_v1')
 
     parser.add_argument('--model_ckpt',
                         default="path/to/model.ckpt",

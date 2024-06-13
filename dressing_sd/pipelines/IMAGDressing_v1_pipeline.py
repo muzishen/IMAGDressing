@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/6/12
-# @Author  : White Jiang
 from diffusers.schedulers import (
     DDIMScheduler,
     DPMSolverMultistepScheduler,
@@ -12,17 +9,13 @@ from diffusers.schedulers import (
 from diffusers.utils import is_accelerate_available
 from diffusers.pipelines.controlnet.pipeline_controlnet import *
 from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion import *
-
-import os
-import sys
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASE_DIR)
-
 from adapter.attention_processor import RefSAttnProcessor2_0
+# from diffusers.pipelines import StableDiffusionPipeline
+
+logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
-class PipControlNet(StableDiffusionControlNetPipeline):
+class IMAGDressing_v1(StableDiffusionPipeline):
     _optional_components = []
 
     def __init__(
@@ -32,7 +25,6 @@ class PipControlNet(StableDiffusionControlNetPipeline):
             unet,
             tokenizer,
             text_encoder,
-            controlnet,
             image_encoder,
             ImgProj,
             scheduler: Union[
@@ -46,13 +38,12 @@ class PipControlNet(StableDiffusionControlNetPipeline):
             safety_checker: StableDiffusionSafetyChecker,
             feature_extractor: CLIPImageProcessor,
     ):
-        super().__init__(vae, text_encoder, tokenizer, unet, controlnet, scheduler, safety_checker, feature_extractor)
+        super().__init__(vae, text_encoder, tokenizer, unet, scheduler, safety_checker, feature_extractor)
 
         self.register_modules(
             vae=vae,
             reference_unet=reference_unet,
             unet=unet,
-            controlnet=controlnet,
             scheduler=scheduler,
             tokenizer=tokenizer,
             text_encoder=text_encoder,
@@ -336,19 +327,16 @@ class PipControlNet(StableDiffusionControlNetPipeline):
 
         return image
 
-    def get_image_embeds(self, clip_image=None, faceid_embeds=None):
+    def get_image_embeds(self, clip_image=None):
         with torch.no_grad():
             # clip_image_embeds = self.image_encoder(clip_image.to(self.device, dtype=torch.float16)).image_embeds
             clip_image_embeds = self.image_encoder(clip_image.to(self.device, dtype=torch.float16),
                                                    output_hidden_states=True).hidden_states[-2]
+            image_prompt_embeds = self.image_proj_model(clip_image_embeds)
             uncond_clip_image_embeds = self.image_encoder(
                 torch.zeros_like(clip_image).to(self.device, dtype=torch.float16), output_hidden_states=True
             ).hidden_states[-2]
-
-            faceid_embeds = faceid_embeds.to(self.device, dtype=torch.float16)
-            image_prompt_embeds = self.image_proj_model(faceid_embeds, clip_image_embeds)
-            uncond_image_prompt_embeds = self.image_proj_model(torch.zeros_like(faceid_embeds),
-                                                               uncond_clip_image_embeds)
+            uncond_image_prompt_embeds = self.image_proj_model(uncond_clip_image_embeds)
         return image_prompt_embeds, uncond_image_prompt_embeds
 
     def set_scale(self, scale):
@@ -367,7 +355,6 @@ class PipControlNet(StableDiffusionControlNetPipeline):
             height,
             num_inference_steps,
             guidance_scale,
-            pose_image=None,
             ref_clip_image=None,
             num_images_per_prompt=1,
             image_scale=1.0,
@@ -382,36 +369,10 @@ class PipControlNet(StableDiffusionControlNetPipeline):
             prompt_embeds: Optional[torch.FloatTensor] = None,
             negative_prompt_embeds: Optional[torch.FloatTensor] = None,
             cross_attention_kwargs: Optional[Dict[str, Any]] = None,
-            controlnet_conditioning_scale: Union[float, List[float]] = 1.0,
-            guess_mode: bool = False,
-            control_guidance_start: Union[float, List[float]] = 0.0,
-            control_guidance_end: Union[float, List[float]] = 1.0,
             **kwargs,
     ):
         self.set_scale(image_scale)
 
-        # controlnet
-        controlnet = self.controlnet._orig_mod if is_compiled_module(self.controlnet) else self.controlnet
-        # align format for control guidance
-        if not isinstance(control_guidance_start, list) and isinstance(control_guidance_end, list):
-            control_guidance_start = len(control_guidance_end) * [control_guidance_start]
-        elif not isinstance(control_guidance_end, list) and isinstance(control_guidance_start, list):
-            control_guidance_end = len(control_guidance_start) * [control_guidance_end]
-        elif not isinstance(control_guidance_start, list) and not isinstance(control_guidance_end, list):
-            mult = len(controlnet.nets) if isinstance(controlnet, MultiControlNetModel) else 1
-            control_guidance_start, control_guidance_end = (
-                mult * [control_guidance_start],
-                mult * [control_guidance_end],
-            )
-        if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
-            controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
-
-        global_pool_conditions = (
-            controlnet.config.global_pool_conditions
-            if isinstance(controlnet, ControlNetModel)
-            else controlnet.nets[0].config.global_pool_conditions
-        )
-        guess_mode = guess_mode or global_pool_conditions
         # Default height and width to unet
         height = height or self.unet.config.sample_size * self.vae_scale_factor
         width = width or self.unet.config.sample_size * self.vae_scale_factor
@@ -426,26 +387,6 @@ class PipControlNet(StableDiffusionControlNetPipeline):
         timesteps = self.scheduler.timesteps
 
         batch_size = 1
-        if pose_image is not None:
-            # Prepare control image
-            if isinstance(controlnet, ControlNetModel):
-                image = self.prepare_image(
-                    image=pose_image,
-                    width=width,
-                    height=height,
-                    batch_size=batch_size * num_images_per_prompt,
-                    num_images_per_prompt=num_images_per_prompt,
-                    device=device,
-                    dtype=controlnet.dtype,
-                    do_classifier_free_guidance=do_classifier_free_guidance,
-                    guess_mode=guess_mode,
-                )
-                if do_classifier_free_guidance and not guess_mode:
-                    image = image.chunk(2)[0]
-                height, width = image.shape[-2:]
-            else:
-                assert False
-            # print(image.shape)
 
         # 3. Encode input prompt
         text_encoder_lora_scale = (
@@ -486,10 +427,8 @@ class PipControlNet(StableDiffusionControlNetPipeline):
             )
 
         # For classifier free guidance, we need to do two forward passes.
-        # Here we concatenate the unconditional and text embeddings into a single batch
         # to avoid doing two forward passes
         if do_classifier_free_guidance:
-            prompt_embeds_control = torch.cat([negative_prompt_embeds, prompt_embeds])
             if ref_clip_image is not None:
                 null_prompt_embeds = torch.cat([cloth_null_embeds, cloth_proj_embed])
             else:
@@ -517,15 +456,6 @@ class PipControlNet(StableDiffusionControlNetPipeline):
         )
         ref_image_latents = self.vae.encode(ref_image_tensor).latent_dist.mean
         ref_image_latents = ref_image_latents * 0.18215  # (b, 4, h, w)
-        if pose_image is not None:
-            #  Create tensor stating which controlnets to keep
-            controlnet_keep = []
-            for i in range(len(timesteps)):
-                keeps = [
-                    1.0 - float(i / len(timesteps) < s or (i + 1) / len(timesteps) > e)
-                    for s, e in zip(control_guidance_start, control_guidance_end)
-                ]
-                controlnet_keep.append(keeps[0] if isinstance(controlnet, ControlNetModel) else keeps)
 
         # denoising loop
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
@@ -566,89 +496,26 @@ class PipControlNet(StableDiffusionControlNetPipeline):
                         guidance_scale_tensor, embedding_dim=self.unet.config.time_cond_proj_dim
                     ).to(device=device, dtype=latents.dtype)
 
-                # for control
-                if pose_image is not None:
-                    # controlnet(s) inference
-                    if guess_mode and self.do_classifier_free_guidance:
-                        # Infer ControlNet only for the conditional batch.
-                        control_model_input = latents
-                        control_model_input = self.scheduler.scale_model_input(control_model_input, t)
-                        controlnet_prompt_embeds = prompt_embeds_control.chunk(2)[1]
-                        # controlnet_prompt_embeds = prompt_embeds
-                    else:
-                        control_model_input = latent_model_input
-                        controlnet_prompt_embeds = prompt_embeds_control
-                    if isinstance(controlnet_keep[i], list):
-                        cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
-                    else:
-                        controlnet_cond_scale = controlnet_conditioning_scale
-                        if isinstance(controlnet_cond_scale, list):
-                            controlnet_cond_scale = controlnet_cond_scale[0]
-                        cond_scale = controlnet_cond_scale * controlnet_keep[i]
-
-                    down_block_res_samples, mid_block_res_sample = self.controlnet(
-                        control_model_input,
-                        t,
-                        encoder_hidden_states=controlnet_prompt_embeds,
-                        controlnet_cond=image,
-                        conditioning_scale=cond_scale,
-                        guess_mode=guess_mode,
-                        return_dict=False,
-                    )
-
-                    # if do_classifier_free_guidance:
-                    down_block_res_samples_con = []
-                    down_block_res_samples_uncon = []
-                    for down_block in down_block_res_samples:
-                        down_block_res_samples_con.append(down_block[1])
-                        down_block_res_samples_uncon.append(down_block[0])
-                    # for prompt_embeds ref + text
-                    noise_pred = self.unet(
-                        latent_model_input[0].unsqueeze(0),
-                        t,
-                        encoder_hidden_states=prompt_embeds,
-                        cross_attention_kwargs={
-                            "sa_hidden_states": sa_hidden_states,
-                        },
-                        timestep_cond=timestep_cond,
-                        down_block_additional_residuals=down_block_res_samples_con,
-                        mid_block_additional_residual=mid_block_res_sample[1],
-                        added_cond_kwargs=None,
-                        return_dict=False,
-                    )[0]
-                    # for negative_prompt_embeds non text
-                    unc_noise_pred = self.unet(
-                        latent_model_input[1].unsqueeze(0),
-                        t,
-                        encoder_hidden_states=negative_prompt_embeds,
-                        timestep_cond=timestep_cond,
-                        down_block_additional_residuals=down_block_res_samples_uncon,
-                        mid_block_additional_residual=mid_block_res_sample[0],
-                        added_cond_kwargs=None,
-                        return_dict=False,
-                    )[0]
-                # for no control
-                else:
-                    noise_pred = self.unet(
-                        latent_model_input[1].unsqueeze(0),
-                        t,
-                        encoder_hidden_states=prompt_embeds,
-                        cross_attention_kwargs={
-                            "sa_hidden_states": sa_hidden_states,
-                        },
-                        timestep_cond=timestep_cond,
-                        added_cond_kwargs=None,
-                        return_dict=False,
-                    )[0]
-                    # for negative_prompt_embeds non text
-                    unc_noise_pred = self.unet(
-                        latent_model_input[0].unsqueeze(0),
-                        t,
-                        encoder_hidden_states=negative_prompt_embeds,
-                        timestep_cond=timestep_cond,
-                        added_cond_kwargs=None,
-                        return_dict=False,
-                    )[0]
+                noise_pred = self.unet(
+                    latent_model_input[0].unsqueeze(0),
+                    t,
+                    encoder_hidden_states=prompt_embeds,
+                    cross_attention_kwargs={
+                        "sa_hidden_states": sa_hidden_states,
+                    },
+                    timestep_cond=timestep_cond,
+                    added_cond_kwargs=None,
+                    return_dict=False,
+                )[0]
+                # for negative_prompt_embeds non text
+                unc_noise_pred = self.unet(
+                    latent_model_input[1].unsqueeze(0),
+                    t,
+                    encoder_hidden_states=negative_prompt_embeds,
+                    timestep_cond=timestep_cond,
+                    added_cond_kwargs=None,
+                    return_dict=False,
+                )[0]
 
                 # perform guidance
                 if do_classifier_free_guidance:
