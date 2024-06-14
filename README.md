@@ -27,6 +27,7 @@
 
 ![compare](assets/compare_magic.png)
 
+![compare](assets/compare_magic2.png)
 
 ### <span style="color:red">Supports text prompts for different scenes</span>
 ![different scenes](assets/different_scenes.png)
