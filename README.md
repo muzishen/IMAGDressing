@@ -27,7 +27,7 @@
 
 ![compare](assets/compare_magic.png)
 
-![different scenes](assets/different.png)
+![different scenes](assets/different_scenes.png)
 
 
 ## 🏷️  Introduction
