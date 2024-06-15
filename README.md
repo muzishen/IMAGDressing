@@ -25,9 +25,9 @@
 
 ## 🔥 **Examples**
 
-![compare](assets/person.png)
-
 ![compare](assets/compare_magic2.png)
+
+![compare](assets/person.png)
 
 ### <span style="color:red">Supports text prompts for different scenes</span>
 ![different scenes](assets/different_scenes.png)
