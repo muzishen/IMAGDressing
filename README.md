@@ -27,9 +27,13 @@
 
 ![compare](assets/compare_magic2.png)
 
+### <span style="color:red">Conbined with IP-Adapter and Contorlnet-Pose</span>
+
+![compare](assets/pose.png)
+
 ![compare](assets/person.png)
 
-### <span style="color:red">Supports text prompts for different scenes</span>
+### <span style="color:red">Support text prompts for different scenes</span>
 ![different scenes](assets/different_scenes.png)
 
 
@@ -73,20 +77,20 @@ You can download our models from [HuggingFace](https://huggingface.co/feishen29/
 ```sh
 python inference_IMAGdressing.py --cloth_path [your cloth path]
 ```
-![fig_base](assets/fig_base.png)
+
 
 ### 2. Random faces use a given pose to dress a given outfit 
 
 ```sh
 python inference_IMAGdressing_controlnetpose.py --cloth_path [your cloth path] --pose_path [your posture path]
 ```
-![fig_pose](assets/fig_pose.png)
+
 ### 3. Specify the face and posture to wear the specified clothes
 
 ```sh
 python inference_IMAGdressing_ipa_controlnetpose.py --cloth_path [your cloth path] --face_path [your face path] --pose_path [your posture path]
 ```
-![fig_pose_face](assets/fig_pose_face.png)
+
 
 
 ## 📚 Get Involved
