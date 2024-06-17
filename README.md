@@ -123,3 +123,11 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 }
 ```
 
+## TODO List
+- [x] Gradio demo
+- [x] Inference code
+- [x] Model weights
+- [ ] Paper
+- [ ] Training code
+- [ ] Video Dressing
+- [ ] Others
