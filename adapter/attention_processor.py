@@ -214,8 +214,7 @@ class CAttnProcessor2_0(torch.nn.Module):
         self.hidden_size = hidden_size
         self.cross_attention_dim = cross_attention_dim
 
-        # self.to_k_ip = nn.Linear(cross_attention_dim or hidden_size, hidden_size, bias=False)
-        # self.to_v_ip = nn.Linear(cross_attention_dim or hidden_size, hidden_size, bias=False)
+
 
     def __call__(
             self,
@@ -279,22 +278,6 @@ class CAttnProcessor2_0(torch.nn.Module):
         hidden_states = hidden_states.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
         hidden_states = hidden_states.to(query.dtype)
 
-        # for ip
-        # if cond_hidden_states:
-        # ip_hidden_states = cond_hidden_states
-        # ip_key = self.to_k_ip(ip_hidden_states)
-        # ip_value = self.to_v_ip(ip_hidden_states)
-        # ip_key = ip_key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
-        # ip_value = ip_value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
-        #
-        # # the output of sdp = (batch, num_heads, seq_len, head_dim)
-        # # TODO: add support for attn.scale when we move to Torch 2.1
-        # ip_hidden_states = F.scaled_dot_product_attention(
-        #     query, ip_key, ip_value, attn_mask=attention_mask, dropout_p=0.0, is_causal=False
-        # )
-        # ip_hidden_states = ip_hidden_states.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
-        # ip_hidden_states = ip_hidden_states.to(query.dtype)
-        # hidden_states = hidden_states + ip_hidden_states
 
         # linear proj
         hidden_states = attn.to_out[0](hidden_states, *args)

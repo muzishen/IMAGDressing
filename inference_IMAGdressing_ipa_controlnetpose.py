@@ -11,7 +11,7 @@ from transformers import CLIPImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
 
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
-from adapter.attention_processor import RefSAttnProcessor2_0, RefLoraSAttnProcessor2_0,  IPAttnProcessor2_0, LoRAIPAttnProcessor2_0 
+from adapter.attention_processor import RefSAttnProcessor2_0, LoraRefSAttnProcessor2_0,  IPAttnProcessor2_0, LoRAIPAttnProcessor2_0 
 import argparse
 from adapter.resampler import Resampler
 from insightface.app import FaceAnalysis
@@ -84,7 +84,7 @@ def prepare(args):
             hidden_size = unet.config.block_out_channels[block_id]
         # lora_rank = hidden_size // 2 # args.lora_rank
         if cross_attention_dim is None:
-            attn_procs[name] = RefLoraSAttnProcessor2_0(name, hidden_size)
+            attn_procs[name] = LoraRefSAttnProcessor2_0(name, hidden_size)
         else:
             attn_procs[name] = LoRAIPAttnProcessor2_0(hidden_size=hidden_size, cross_attention_dim=cross_attention_dim)
 

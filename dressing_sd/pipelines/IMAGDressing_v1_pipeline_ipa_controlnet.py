@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
 from adapter.resampler import ProjPlusModel
-from adapter.attention_processor import RefSAttnProcessor2_0, RefLoraSAttnProcessor2_0,  IPAttnProcessor2_0, LoRAIPAttnProcessor2_0 
+from adapter.attention_processor import RefSAttnProcessor2_0, LoraRefSAttnProcessor2_0,  IPAttnProcessor2_0, LoRAIPAttnProcessor2_0 
 
 
 class IMAGDressing_v1(StableDiffusionControlNetPipeline):
@@ -378,7 +378,7 @@ class IMAGDressing_v1(StableDiffusionControlNetPipeline):
 
     def set_scale(self, scale, lora_scale):
         for attn_processor in self.unet.attn_processors.values():
-            if isinstance(attn_processor, RefLoraSAttnProcessor2_0):
+            if isinstance(attn_processor, LoraRefSAttnProcessor2_0):
                 attn_processor.scale = scale
                 attn_processor.lora_scale = lora_scale
 
