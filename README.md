@@ -26,10 +26,10 @@
 ## 🔥 **Examples**
 
 <div style="display: flex; justify-content: space-around;">
-  <img src="assets/scrolling_images1.gif" alt="GIF 1" width="300" />
-  <img src="assets/scrolling_images2.gif" alt="GIF 2" width="300" />
-  <img src="assets/scrolling_images3.gif" alt="GIF 3" width="300" />
-    <img src="assets/scrolling_images4.gif" alt="GIF 4" width="300" />
+  <img src="assets/scrolling_images1.gif" alt="GIF 1" width="200" />
+  <img src="assets/scrolling_images2.gif" alt="GIF 2" width="200" />
+  <img src="assets/scrolling_images3.gif" alt="GIF 3" width="200" />
+    <img src="assets/scrolling_images4.gif" alt="GIF 4" width="200" />
 </div>
 
 
