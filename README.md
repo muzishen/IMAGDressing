@@ -110,7 +110,7 @@ We would like to thank the contributors to the [IDM-VTON](https://github.com/yis
 
 The IMAGDressing code is available for both academic and commercial use. However, the models available for manual and automatic download from IMAGDressing are intended solely for non-commercial research purposes. Similarly, our released checkpoints are restricted to research use only. Users are free to create images using this tool, but they must adhere to local laws and use it responsibly. The developers disclaim any liability for potential misuse by users.
 
-## Citation
+## 📝 Citation
 
 If you find IMAGDressing-v1 useful for your research and applications, please cite using this BibTeX:
 
@@ -123,7 +123,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 }
 ```
 
-## TODO List
+## 🕒 TODO List
 - [x] Gradio demo
 - [x] Inference code
 - [x] Model weights (512 sized version)
@@ -132,3 +132,6 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [ ] Training code
 - [ ] Video Dressing
 - [ ] Others, such as User-Needed Requirements
+
+## 📨 Contact
+If you have any questions, please feel free to contact with me at shenfei140721@126.com.
