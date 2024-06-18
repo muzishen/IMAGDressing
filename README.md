@@ -126,7 +126,8 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 ## TODO List
 - [x] Gradio demo
 - [x] Inference code
-- [x] Model weights
+- [x] Model weights (512 sized version)
+- [ ] Model weights (More higher sized version)
 - [ ] Paper
 - [ ] Training code
 - [ ] Video Dressing
