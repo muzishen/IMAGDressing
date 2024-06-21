@@ -15,7 +15,9 @@ import argparse
 from adapter.resampler import Resampler
 import numpy as np
 from diffusers.utils import load_image
-from garment_seg.process import load_seg_model, generate_mask
+from preprocess.humanparsing.run_parsing import Parsing
+from preprocess.openpose.run_openpose import OpenPose
+from preprocess.utils_mask import get_mask_location
 import cv2 as cv
 
 
@@ -28,6 +30,19 @@ def image_grid(imgs, rows, cols):
     for i, img in enumerate(imgs):
         grid.paste(img, box=(i % cols * w, i // cols * h))
     return grid
+
+def resize_img(input_image, max_side=640, min_side=512, size=None,
+               pad_to_max_side=False, mode=Image.BILINEAR, base_pixel_number=64):
+    w, h = input_image.size
+    ratio = min_side / min(h, w)
+    w, h = round(ratio * w), round(ratio * h)
+    ratio = max_side / max(h, w)
+    input_image = input_image.resize([round(ratio * w), round(ratio * h)], mode)
+    w_resize_new = (round(ratio * w) // base_pixel_number) * base_pixel_number
+    h_resize_new = (round(ratio * h) // base_pixel_number) * base_pixel_number
+    input_image = input_image.resize([w_resize_new, h_resize_new], mode)
+
+    return input_image
 
 
 def make_inpaint_condition(image, image_mask):
@@ -150,7 +165,7 @@ if __name__ == "__main__":
                         default="path/to/model.ckpt",
                         type=str)
     parser.add_argument('--cloth_path', type=str, required=True)
-    parser.add_argument('--personal_path', type=str, required=True)
+    parser.add_argument('--model_path', type=str, required=True)
     parser.add_argument('--output_path', type=str, default="./output_sd_inpaint")
     parser.add_argument('--device', type=str, default="cuda:0")
     args = parser.parse_args()
@@ -160,8 +175,11 @@ if __name__ == "__main__":
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-
+    # prepare pipline
     pipe, generator = prepare(args)
+    # prepare mask model
+    parsing_model = Parsing(0)
+    openpose_model = OpenPose(0)
     print('====================== pipe load finish ===================')
 
     num_samples = 1
@@ -178,17 +196,19 @@ if __name__ == "__main__":
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
 
     clothes_img = Image.open(args.cloth_path).convert("RGB")
+    clothes_img = resize_img(clothes_img)
+
     vae_clothes = img_transform(clothes_img).unsqueeze(0)
     ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
-    checkpoint_path = '/aigc_data/code/MagicClothing-main/cloth_segm.pth'
-    seg_net = load_seg_model(checkpoint_path, device=args.device)
 
-    init_image = load_image(args.personal_path)
-    init_image = init_image.resize((512, 512))
-    mask_image = generate_mask(init_image, net=seg_net, device=args.device)
-    mask_image.save("mask.jpg")
+    model_image = load_image(args.model_path)
+    keypoints = openpose_model(model_image.resize((384, 512)))
+    model_parse, _ = parsing_model(model_image.resize((384, 512)))
+    mask, mask_gray = get_mask_location('hd', "upper_body", model_parse, keypoints)
 
-    control_image = make_inpaint_condition(init_image, mask_image)
+    mask_image = mask.resize((512, 512))
+    model_image = model_image.resize((512, 512))
+    control_image = make_inpaint_condition(model_image, mask_image)
 
     output = pipe(
         ref_image=vae_clothes,
@@ -196,13 +216,13 @@ if __name__ == "__main__":
         ref_clip_image=ref_clip_image,
         null_prompt=null_prompt,
         negative_prompt=negative_prompt,
-        image=init_image,
+        image=model_image,
         mask_image=mask_image,
         control_image=control_image,
         width=512,
         height=640,
         num_images_per_prompt=num_samples,
-        guidance_scale=2.5,
+        guidance_scale=5.0,
         image_scale=1.0,
         generator=generator,
         num_inference_steps=50,

@@ -44,6 +44,9 @@
 ### <span style="color:red">Support text prompts for different scenes</span>
 ![different scenes](assets/different_scenes.png)
 
+### <span style="color:red">Support specify the model (Experimental Feature)</span>
+![inpainting](assets/inpainting.png)
+
 
 ## 🏷️  Introduction
 
@@ -99,6 +102,11 @@ python inference_IMAGdressing_controlnetpose.py --cloth_path [your cloth path] -
 python inference_IMAGdressing_ipa_controlnetpose.py --cloth_path [your cloth path] --face_path [your face path] --pose_path [your posture path]
 ```
 
+### 4. Specify the model to wear the specified clothes (Experimental Feature)
+<span style="color:red">Please download the model file from [IDM-VTON-Huggingface](https://huggingface.co/spaces/yisol/IDM-VTON/tree/main) to the ckpt folder first.</span>
+```sh
+python inference_IMAGdressing_controlnetinpainting.py --cloth_path [your cloth path] --model_path [your model path]
+```
 
 
 ## 📚 Get Involved
