@@ -136,6 +136,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [x] Gradio demo
 - [x] Inference code
 - [x] Model weights (512 sized version)
+- [x] Support inpaint
 - [ ] Model weights (More higher sized version)
 - [ ] Paper
 - [ ] Training code
