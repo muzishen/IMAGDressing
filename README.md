@@ -1,4 +1,4 @@
-# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Dressing**
+# **👔IMAGDressing👔: Interactive Modular Apparel Generation for Virtual Dressing**
 
 
 ## 📦️ Release
