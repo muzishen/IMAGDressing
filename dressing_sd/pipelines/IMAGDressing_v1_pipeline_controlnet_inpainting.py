@@ -60,6 +60,19 @@ class IMAGDressing_v1(StableDiffusionControlNetInpaintPipeline):
             vae_scale_factor=self.vae_scale_factor, do_convert_rgb=True, do_normalize=False
         )
 
+    @property
+    def _execution_device(self):
+        if self.device != torch.device("meta") or not hasattr(self.unet, "_hf_hook"):
+            return self.device
+        for module in self.unet.modules():
+            if (
+                    hasattr(module, "_hf_hook")
+                    and hasattr(module._hf_hook, "execution_device")
+                    and module._hf_hook.execution_device is not None
+            ):
+                return torch.device(module._hf_hook.execution_device)
+        return self.device
+    
     def set_scale(self, scale):
         for attn_processor in self.unet.attn_processors.values():
             if isinstance(attn_processor, RefSAttnProcessor2_0):
