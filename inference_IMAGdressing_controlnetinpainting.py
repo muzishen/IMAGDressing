@@ -162,7 +162,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='IMAGDressing_v1')
 
     parser.add_argument('--model_ckpt',
-                        default="path/to/model.ckpt",
+                        default="ckpt/IMAGDressing-v1_512.pt",
                         type=str)
     parser.add_argument('--cloth_path', type=str, required=True)
     parser.add_argument('--model_path', type=str, required=True)
