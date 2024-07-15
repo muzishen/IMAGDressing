@@ -162,7 +162,7 @@ if __name__ == "__main__":
     parser.add_argument('--cloth_path', type=str, required=True)
     parser.add_argument('--face_path', default=None, type=str)
     parser.add_argument('--pose_path', default=None, type=str)
-    parser.add_argument('--output_path', type=str, default="./output_sd")
+    parser.add_argument('--output_path', type=str, default="./output_sd2")
     parser.add_argument('--device', type=str, default="cuda:0")
     args = parser.parse_args()
 
@@ -193,53 +193,61 @@ if __name__ == "__main__":
     null_prompt = ''
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
 
-    clothes_img = Image.open(args.cloth_path).convert("RGB")
-    clothes_img = resize_img(clothes_img)
-    vae_clothes = img_transform(clothes_img).unsqueeze(0)
-    ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
+    cloth_files = [f for f in os.listdir(args.cloth_path) if os.path.isfile(os.path.join(args.cloth_path, f))]
+    face_files = [f for f in os.listdir(args.face_path) if os.path.isfile(os.path.join(args.face_path, f))]
+    # face_files = ['1.jpg']
+    
+    for face_file in face_files:
+        for cloth_file in cloth_files:
+            cloth_path = os.path.join(args.cloth_path, cloth_file)
+            clothes_img = Image.open(cloth_path).convert("RGB")
+            clothes_img = resize_img(clothes_img)
+            vae_clothes = img_transform(clothes_img).unsqueeze(0)
+            ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
 
-    if args.face_path is not None:
+            face_path = os.path.join(args.face_path, face_file)
+            if face_path is not None:
 
-        image = cv2.imread(args.face_path)
-        faces = app.get(image)
+                image = cv2.imread(face_path)
+                faces = app.get(image)
 
-        faceid_embeds = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
-        face_image = face_align.norm_crop(image, landmark=faces[0].kps, image_size=224)
-        face_clip_image = clip_image_processor(images=face_image, return_tensors="pt").pixel_values
-    else:
-        faceid_embeds = None
-        face_clip_image = None
+                faceid_embeds = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
+                face_image = face_align.norm_crop(image, landmark=faces[0].kps, image_size=224)
+                face_clip_image = clip_image_processor(images=face_image, return_tensors="pt").pixel_values
+            else:
+                faceid_embeds = None
+                face_clip_image = None
 
-    if args.pose_path is not None:
-        pose_image = diffusers.utils.load_image(args.pose_path)
-    else:
-        pose_image = None
+            if args.pose_path is not None:
+                pose_image = diffusers.utils.load_image(args.pose_path)
+            else:
+                pose_image = None
 
-    output = pipe(
-        ref_image=vae_clothes,
-        prompt=prompt,
-        ref_clip_image=ref_clip_image,
-        pose_image=pose_image,
-        face_clip_image=face_clip_image,
-        faceid_embeds=faceid_embeds,
-        null_prompt=null_prompt,
-        negative_prompt=negative_prompt,
-        width=512,
-        height=640,
-        num_images_per_prompt=num_samples,
-        guidance_scale=7.0,
-        image_scale=0.9,
-        ipa_scale=0.9,
-        s_lora_scale= 0.2,
-        c_lora_scale= 0.2,
-        generator=generator,
-        num_inference_steps=50,
-    ).images
+            output = pipe(
+                ref_image=vae_clothes,
+                prompt=prompt,
+                ref_clip_image=ref_clip_image,
+                pose_image=pose_image,
+                face_clip_image=face_clip_image,
+                faceid_embeds=faceid_embeds,
+                null_prompt=null_prompt,
+                negative_prompt=negative_prompt,
+                width=512,
+                height=640,
+                num_images_per_prompt=num_samples,
+                guidance_scale=7.0,
+                image_scale=0.9,
+                ipa_scale=0.9,
+                s_lora_scale= 0.2,
+                c_lora_scale= 0.2,
+                generator=generator,
+                num_inference_steps=50,
+            ).images
 
-    save_output = []
-    save_output.append(output[0])
-    save_output.insert(0, clothes_img.resize((512, 640), Image.BICUBIC))
+            save_output = []
+            save_output.append(output[0])
+            save_output.insert(0, clothes_img.resize((512, 640), Image.BICUBIC))
 
-    grid = image_grid(save_output, 1, 2)
-    grid.save(
-        output_path + '/' + args.cloth_path.split("/")[-1])
+            grid = image_grid(save_output, 1, 2)
+            output_filename = f"{os.path.splitext(face_file)[0]}_{os.path.splitext(cloth_file)[0]}.png"
+            grid.save(os.path.join(output_path, output_filename))
