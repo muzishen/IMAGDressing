@@ -1,9 +1,6 @@
-import diffusers
-from dressing_sd.pipelines.IMAGDressing_v1_pipeline_ipa_controlnet import IMAGDressing_v1
+from dressing_sd.pipelines.IMAGDressing_v1_pipeline_controlnet_inpainting import IMAGDressing_v1
 import os
 import torch
-
-from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, CAttnProcessor2_0
 
 from PIL import Image
 from diffusers import ControlNetModel, UNet2DConditionModel, \
@@ -13,12 +10,15 @@ from transformers import CLIPImageProcessor
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
 
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
-from adapter.attention_processor import RefSAttnProcessor2_0, LoraRefSAttnProcessor2_0,  IPAttnProcessor2_0, LoRAIPAttnProcessor2_0 
+from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, CAttnProcessor2_0
 import argparse
 from adapter.resampler import Resampler
-from insightface.app import FaceAnalysis
-import cv2
-from insightface.utils import face_align
+import numpy as np
+from diffusers.utils import load_image
+from preprocess.humanparsing.run_parsing import Parsing
+from preprocess.openpose.run_openpose import OpenPose
+from preprocess.utils_mask import get_mask_location
+import cv2 as cv
 
 
 def image_grid(imgs, rows, cols):
@@ -30,7 +30,6 @@ def image_grid(imgs, rows, cols):
     for i, img in enumerate(imgs):
         grid.paste(img, box=(i % cols * w, i // cols * h))
     return grid
-
 
 def resize_img(input_image, max_side=640, min_side=512, size=None,
                pad_to_max_side=False, mode=Image.BILINEAR, base_pixel_number=64):
@@ -44,6 +43,20 @@ def resize_img(input_image, max_side=640, min_side=512, size=None,
     input_image = input_image.resize([w_resize_new, h_resize_new], mode)
 
     return input_image
+
+
+def make_inpaint_condition(image, image_mask):
+    image = np.array(image.convert("RGB")).astype(np.float32) / 255.0
+
+    image_mask = np.array(image_mask.convert("L")).astype(np.float32) / 255.0
+
+    assert image.shape[0:1] == image_mask.shape[0:1], "image and image_mask must have the same image size"
+    image[image_mask > 0.5] = -1.0  # set as masked pixel
+    # image[image_mask > 0.5] = 0  # set as masked pixel
+    # cv.imwrite("control_image.jpg", np.array(image * 255))
+    image = np.expand_dims(image, 0).transpose(0, 3, 1, 2)
+    image = torch.from_numpy(image)
+    return image
 
 
 def prepare(args):
@@ -84,21 +97,16 @@ def prepare(args):
         elif name.startswith("down_blocks"):
             block_id = int(name[len("down_blocks.")])
             hidden_size = unet.config.block_out_channels[block_id]
-        # lora_rank = hidden_size // 2 # args.lora_rank
         if cross_attention_dim is None:
-            attn_procs[name] = LoraRefSAttnProcessor2_0(name, hidden_size)
+            attn_procs[name] = RefSAttnProcessor2_0(name, hidden_size)
         else:
-            attn_procs[name] = LoRAIPAttnProcessor2_0(hidden_size=hidden_size,
-                                                      cross_attention_dim=cross_attention_dim,
-                                                      scale=1.0, rank=128,
-                                                      num_tokens=4)
+            attn_procs[name] = CAttnProcessor2_0(name, hidden_size=hidden_size,
+                                                 cross_attention_dim=cross_attention_dim)
 
     unet.set_attn_processor(attn_procs)
     adapter_modules = torch.nn.ModuleList(unet.attn_processors.values())
     adapter_modules = adapter_modules.to(dtype=torch.float16, device=args.device)
     del st
-
-
 
     ref_unet = UNet2DConditionModel.from_pretrained("SG161222/Realistic_Vision_V4.0_noVAE", subfolder="unet").to(
         dtype=torch.float16,
@@ -138,32 +146,28 @@ def prepare(args):
         set_alpha_to_one=False,
         steps_offset=1,
     )
-
-    control_net_openpose = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_openpose",
-                                                           torch_dtype=torch.float16).to(device=args.device)
+    control_net = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_inpaint",
+                                                  torch_dtype=torch.float16).to(device=args.device)
     pipe = IMAGDressing_v1(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
-                            text_encoder=text_encoder, image_encoder=image_encoder,
-                            ip_ckpt=args.ip_ckpt,
-                            ImgProj=image_proj, controlnet=control_net_openpose,
-                            scheduler=noise_scheduler,
-                            safety_checker=StableDiffusionSafetyChecker,
-                            feature_extractor=CLIPImageProcessor)
+                           text_encoder=text_encoder, image_encoder=image_encoder,
+                           ImgProj=image_proj,
+                           scheduler=noise_scheduler,
+                           controlnet=control_net,
+                           safety_checker=StableDiffusionSafetyChecker,
+                           feature_extractor=CLIPImageProcessor)
     return pipe, generator
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='IMAGDressing_v1')
-    parser.add_argument('--ip_ckpt',
-                        default="ckpt/ip-adapter-faceid-plusv2_sd15.bin",
-                        type=str)
+
     parser.add_argument('--model_ckpt',
                         default="ckpt/IMAGDressing-v1_512.pt",
                         type=str)
     parser.add_argument('--cloth_path', type=str, required=True)
-    parser.add_argument('--face_path', default=None, type=str)
-    parser.add_argument('--pose_path', default=None, type=str)
-    parser.add_argument('--output_path', type=str, default="./output_sd")
-    parser.add_argument('--device', type=str, default="cuda:0")
+    parser.add_argument('--model_path', type=str, required=True)
+    parser.add_argument('--output_path', type=str, default="./output_sd_inpaint")
+    parser.add_argument('--device', type=str, default="cuda:1")
     args = parser.parse_args()
 
     # svae path
@@ -171,8 +175,11 @@ if __name__ == "__main__":
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-
+    # prepare pipline
     pipe, generator = prepare(args)
+    # prepare mask model
+    parsing_model = Parsing(1)
+    openpose_model = OpenPose(1)
     print('====================== pipe load finish ===================')
 
     num_samples = 1
@@ -184,62 +191,54 @@ if __name__ == "__main__":
         transforms.Normalize([0.5], [0.5]),
     ])
 
-    app = FaceAnalysis(name="buffalo_l", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
-    app.prepare(ctx_id=0, det_size=(640, 640))
-
-
-    prompt = 'A beautiful woman'
-    prompt = prompt + ', best quality, high quality'
+    prompt = 'A beautiful model'
     null_prompt = ''
     negative_prompt = 'bare, naked, nude, undressed, monochrome, lowres, bad anatomy, worst quality, low quality'
+    
+    cloth_files = [f for f in os.listdir(args.cloth_path) if os.path.isfile(os.path.join(args.cloth_path, f))]
+    model_files = [f for f in os.listdir(args.model_path) if os.path.isfile(os.path.join(args.model_path, f))]
+    for model_file in model_files:
+        for cloth_file in cloth_files:
+            cloth_path = os.path.join(args.cloth_path, cloth_file)
 
-    clothes_img = Image.open(args.cloth_path).convert("RGB")
-    clothes_img = resize_img(clothes_img)
-    vae_clothes = img_transform(clothes_img).unsqueeze(0)
-    ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
+            clothes_img = Image.open(cloth_path).convert("RGB")
+            clothes_img = resize_img(clothes_img)
 
-    if args.face_path is not None:
+            vae_clothes = img_transform(clothes_img).unsqueeze(0)
+            ref_clip_image = clip_image_processor(images=clothes_img, return_tensors="pt").pixel_values
 
-        image = cv2.imread(args.face_path)
-        faces = app.get(image)
+            model_path = os.path.join(args.model_path, model_file)
+            model_image = load_image(model_path)
+            keypoints = openpose_model(model_image.resize((384, 512)))
+            model_parse, _ = parsing_model(model_image.resize((384, 512)))
+            mask, mask_gray = get_mask_location('hd', "upper_body", model_parse, keypoints)
 
-        faceid_embeds = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
-        face_image = face_align.norm_crop(image, landmark=faces[0].kps, image_size=224)
-        face_clip_image = clip_image_processor(images=face_image, return_tensors="pt").pixel_values
-    else:
-        faceid_embeds = None
-        face_clip_image = None
+            mask_image = mask.resize((512, 512))
+            model_image = model_image.resize((512, 512))
+            control_image = make_inpaint_condition(model_image, mask_image)
 
-    if args.pose_path is not None:
-        pose_image = diffusers.utils.load_image(args.pose_path)
-    else:
-        pose_image = None
+            output = pipe(
+                ref_image=vae_clothes,
+                prompt=prompt,
+                ref_clip_image=ref_clip_image,
+                null_prompt=null_prompt,
+                negative_prompt=negative_prompt,
+                image=model_image,
+                mask_image=mask_image,
+                control_image=control_image,
+                width=512,
+                height=640,
+                num_images_per_prompt=num_samples,
+                guidance_scale=5.0,
+                image_scale=1.0,
+                generator=generator,
+                num_inference_steps=50,
+            ).images
 
-    output = pipe(
-        ref_image=vae_clothes,
-        prompt=prompt,
-        ref_clip_image=ref_clip_image,
-        pose_image=pose_image,
-        face_clip_image=face_clip_image,
-        faceid_embeds=faceid_embeds,
-        null_prompt=null_prompt,
-        negative_prompt=negative_prompt,
-        width=512,
-        height=640,
-        num_images_per_prompt=num_samples,
-        guidance_scale=7.0,
-        image_scale=0.9,
-        ipa_scale=0.9,
-        s_lora_scale= 0.2,
-        c_lora_scale= 0.2,
-        generator=generator,
-        num_inference_steps=50,
-    ).images
+            save_output = []
+            save_output.append(output[0])
+            save_output.insert(0, clothes_img.resize((512, 640), Image.BICUBIC))
 
-    save_output = []
-    save_output.append(output[0])
-    save_output.insert(0, clothes_img.resize((512, 640), Image.BICUBIC))
-
-    grid = image_grid(save_output, 1, 2)
-    grid.save(
-        output_path + '/' + args.cloth_path.split("/")[-1])
+            grid = image_grid(save_output, 1, 2)
+            output_filename = f"{os.path.splitext(model_file)[0]}_{os.path.splitext(cloth_file)[0]}.png"
+            grid.save(os.path.join(output_path, output_filename))

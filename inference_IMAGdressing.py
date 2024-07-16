@@ -45,7 +45,7 @@ def prepare(args):
     tokenizer = CLIPTokenizer.from_pretrained("SG161222/Realistic_Vision_V4.0_noVAE", subfolder="tokenizer")
     text_encoder = CLIPTextModel.from_pretrained("SG161222/Realistic_Vision_V4.0_noVAE", subfolder="text_encoder").to(
         dtype=torch.float16, device=args.device)
-    image_encoder = CLIPVisionModelWithProjection.from_pretrained("h94/IP-Adapter", subfolder="image_encoder").to(
+    image_encoder = CLIPVisionModelWithProjection.from_pretrained("h94/IP-Adapter", subfolder="models/image_encoder").to(
         dtype=torch.float16, device=args.device)
     unet = UNet2DConditionModel.from_pretrained("SG161222/Realistic_Vision_V4.0_noVAE", subfolder="unet").to(
         dtype=torch.float16,
@@ -138,7 +138,7 @@ def prepare(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='IMAGDressing_v1')
     parser.add_argument('--model_ckpt',
-                        default="path/to/model.ckpt",
+                        default="ckpt/IMAGDressing-v1_512.pt",
                         type=str)
     parser.add_argument('--cloth_path', type=str, required=True)
     parser.add_argument('--output_path', type=str, default="./output_sd_base")
