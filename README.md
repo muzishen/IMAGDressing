@@ -13,7 +13,7 @@
 
 ## IMAGDressing-v1: Customizable Virtual Dressing
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
-<a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Technique-Report-red'></a>
+<a href='http://arxiv.org/abs/2407.12705'><img src='https://img.shields.io/badge/Technique-Report-red'></a>
 <a href='https://huggingface.co/feishen29/IMAGDressing'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue'></a>
 [![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)](https://github.com/muzishen/IMAGDressing)
 
@@ -129,7 +129,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 @article{shen2024IMAGDressing-v1,
   title={IMAGDressing-v1: Customizable Virtual Dressing},
   author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Du, Xiaoyu, Li Zechao, and Tang, Jinghui},
-  booktitle={Coming Soon},
+  booktitle={arXiv preprint arXiv:2407.12705},
   year={2024}
 }
 ```
@@ -140,7 +140,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [x] Model weights (512 sized version)
 - [x] Support inpaint
 - [ ] Model weights (More higher sized version)
-- [ ] Paper
+- [x] Paper
 - [ ] Training code
 - [ ] Video Dressing
 - [ ] Others, such as User-Needed Requirements
