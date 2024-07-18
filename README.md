@@ -141,6 +141,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [x] Support inpaint
 - [ ] Model weights (More higher sized version)
 - [x] Paper
+- [ ] Evaluate metric code
 - [ ] Training code
 - [ ] Video Dressing
 - [ ] Others, such as User-Needed Requirements
