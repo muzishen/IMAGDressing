@@ -2,6 +2,7 @@
 
 
 ## 📦️ Release
+- [2024/07/18] 🔥 We release the [technical report](http://arxiv.org/abs/2407.12705) and [CAMI metric code](https://github.com/muzishen/IMAGDressing/tree/main/metric).
 - [2024/07/16] 🔥 We add the batch inference for [full VD](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_controlnetinpainting_folder.py) and [VTON](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_ipa_controlnetpose_folder.py). Thanks @ZhaoChaoqun for the contribution.
 - [2024/07/01] 🔥 We release the test cases in the assets/images directory.
 - [2024/06/21] 🔥 We release the inpainting feature to enable outfit changing. **[Experimental Feature](assets/inpainting.png)**.
@@ -141,7 +142,8 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [x] Support inpaint
 - [ ] Model weights (More higher sized version)
 - [x] Paper
-- [ ] Evaluate metric code
+- [x] Evaluate metric code
+- [ ] IGPair dataset
 - [ ] Training code
 - [ ] Video Dressing
 - [ ] Others, such as User-Needed Requirements
