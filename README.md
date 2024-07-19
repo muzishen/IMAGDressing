@@ -20,9 +20,11 @@
 
 
 ### 🚀 **Key Features:**
-1. **Simple Architecture**: IMAGDressing-v1 produces lifelike garments and enables easy user-driven scene editing. 
-2. **Flexible Plugin Compatibility**: IMAGDressing-v1 modestly integrates with extension plugins such as [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff).
-3. **Rapid Customization**: Enables rapid customization in seconds without the need for additional LoRA training.
+1. **Simple Architecture**: IMAGDressing-v1 generates lifelike garments and facilitates easy user-driven scene editing.
+2. **New Task, Metric, and Dataset**: Introduces the virtual dressing (VD) task, designs a comprehensive affinity metric index (CAMI), and releases the IGPair dataset.
+3. **Flexible Plugin Compatibility**: Seamlessly integrates with extension plugins such as [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter), [ControlNet](https://github.com/lllyasviel/ControlNet), [T2I-Adapter](https://github.com/TencentARC/T2I-Adapter), and [AnimateDiff](https://github.com/guoyww/AnimateDiff).
+4. **Rapid Customization**: Allows for rapid customization within seconds without the need for additional LoRA training.
+
 
 
 
