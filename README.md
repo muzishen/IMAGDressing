@@ -42,7 +42,7 @@
 
 ![compare](assets/compare_magic2.png)
 
-### <span style="color:red">Conbined with IP-Adapter and Contorlnet-Pose</span>
+### <span style="color:red">Conbined with IP-Adapter and Controlnet-Pose</span>
 
 ![compare](assets/pose.png)
 
