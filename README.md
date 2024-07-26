@@ -123,7 +123,10 @@ python inference_IMAGdressing_counterfeit-v30.py --cloth_path [your cloth path] 
 ```
 
 ## 📚 Get Involved
-Join us on this exciting journey to transform virtual try-on systems. Star⭐️ our repository to stay updated with the latest advancements, and contribute to making **IMAGDressing** the leading solution for virtual clothing generation.
+Join us on this exciting journey to transform virtual dressing systems. Star⭐️ our repository to stay updated with the latest advancements, and contribute to making **IMAGDressing** the leading solution for virtual dressing generation.
+### Third-party Implementations of IMAGDressing-v1:
+- [windows-webui](https://github.com/v3ucn/IMAGdressing_WebUi_For_Windows) by @v3ucn
+- [comfyUI](https://github.com/AIFSH/IMAGDressing-ComfyUI) by @AIFSH
 
 
 ## Acknowledgement
