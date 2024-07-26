@@ -2,7 +2,7 @@
 
 
 ## 📦️ Release
-- [2024/07/26] 🔥 We release the [Online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
+- [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
 - [2024/07/19] 🔥 We release the [code](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_cartoon_style.py) and [examples](https://github.com/muzishen/IMAGDressing/blob/main/assets/cartoon.png) for cartoon-style virtual dressing.
 - [2024/07/18] 🔥 We release the [technical report of IMAGDressing-v1](http://arxiv.org/abs/2407.12705) and [CAMI metric code](https://github.com/muzishen/IMAGDressing/tree/main/metric).
 - [2024/07/16] 🔥 We add the batch inference for [full VD](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_controlnetinpainting_folder.py) and [VTON](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_ipa_controlnetpose_folder.py). Thanks @ZhaoChaoqun for the contribution.
