@@ -2,13 +2,13 @@
 
 
 ## 📦️ Release
-- [2024/07/26] 🔥 We release the [Online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs.
+- [2024/07/26] 🔥 We release the [Online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
 - [2024/07/19] 🔥 We release the [code](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_cartoon_style.py) and [examples](https://github.com/muzishen/IMAGDressing/blob/main/assets/cartoon.png) for cartoon-style virtual dressing.
 - [2024/07/18] 🔥 We release the [technical report of IMAGDressing-v1](http://arxiv.org/abs/2407.12705) and [CAMI metric code](https://github.com/muzishen/IMAGDressing/tree/main/metric).
 - [2024/07/16] 🔥 We add the batch inference for [full VD](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_controlnetinpainting_folder.py) and [VTON](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_ipa_controlnetpose_folder.py). Thanks @ZhaoChaoqun for the contribution.
 - [2024/07/01] 🔥 We release the test cases in the assets/images directory.
 - [2024/06/21] 🔥 We release the inpainting feature to enable outfit changing. **[Experimental Feature](assets/inpainting.png)**.
-- [2024/06/13] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1 (**Have Recovered**).
+- [2024/06/13] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1 (**Service deprecation imminent**).
 - [2024/05/28] 🔥 We release the inference code of SD1.5 that is compatible with [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) and [ControlNet](https://github.com/lllyasviel/ControlNet).
 - [2024/05/08]  🔥 We launch the [project page](https://imagdressing.github.io/) of IMAGDressing-v1.
 
