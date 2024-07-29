@@ -2,12 +2,13 @@
 
 
 ## 📦️ Release
+- [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
 - [2024/07/19] 🔥 We release the [code](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_cartoon_style.py) and [examples](https://github.com/muzishen/IMAGDressing/blob/main/assets/cartoon.png) for cartoon-style virtual dressing.
 - [2024/07/18] 🔥 We release the [technical report of IMAGDressing-v1](http://arxiv.org/abs/2407.12705) and [CAMI metric code](https://github.com/muzishen/IMAGDressing/tree/main/metric).
 - [2024/07/16] 🔥 We add the batch inference for [full VD](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_controlnetinpainting_folder.py) and [VTON](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_ipa_controlnetpose_folder.py). Thanks @ZhaoChaoqun for the contribution.
 - [2024/07/01] 🔥 We release the test cases in the assets/images directory.
 - [2024/06/21] 🔥 We release the inpainting feature to enable outfit changing. **[Experimental Feature](assets/inpainting.png)**.
-- [2024/06/13] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1.
+- [2024/06/13] 🔥 We release the [Gradio_demo](https://sf.dictdoc.site/) of IMAGDressing-v1 (**Service deprecation imminent**).
 - [2024/05/28] 🔥 We release the inference code of SD1.5 that is compatible with [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) and [ControlNet](https://github.com/lllyasviel/ControlNet).
 - [2024/05/08]  🔥 We launch the [project page](https://imagdressing.github.io/) of IMAGDressing-v1.
 
@@ -42,7 +43,7 @@
 
 ![compare](assets/compare_magic2.png)
 
-### <span style="color:red">Conbined with IP-Adapter and Contorlnet-Pose</span>
+### <span style="color:red">Conbined with IP-Adapter and Controlnet-Pose</span>
 
 ![compare](assets/pose.png)
 
@@ -123,7 +124,10 @@ python inference_IMAGdressing_counterfeit-v30.py --cloth_path [your cloth path] 
 ```
 
 ## 📚 Get Involved
-Join us on this exciting journey to transform virtual try-on systems. Star⭐️ our repository to stay updated with the latest advancements, and contribute to making **IMAGDressing** the leading solution for virtual clothing generation.
+Join us on this exciting journey to transform virtual dressing systems. Star⭐️ our repository to stay updated with the latest advancements, and contribute to making **IMAGDressing** the leading solution for virtual dressing generation.
+### Third-party Implementations of IMAGDressing-v1:
+- [windows-webui](https://github.com/v3ucn/IMAGdressing_WebUi_For_Windows) by @v3ucn
+- [comfyUI](https://github.com/AIFSH/IMAGDressing-ComfyUI) by @AIFSH
 
 
 ## Acknowledgement
