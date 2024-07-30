@@ -2,6 +2,7 @@
 
 
 ## 📦️ Release
+- [2024/07/30] 🔥 We release the [WebUI Code](https://github.com/muzishen/IMAGDressing/blob/main/app.py) for gradio interface.
 - [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
 - [2024/07/19] 🔥 We release the [code](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_cartoon_style.py) and [examples](https://github.com/muzishen/IMAGDressing/blob/main/assets/cartoon.png) for cartoon-style virtual dressing.
 - [2024/07/18] 🔥 We release the [technical report of IMAGDressing-v1](http://arxiv.org/abs/2407.12705) and [CAMI metric code](https://github.com/muzishen/IMAGDressing/tree/main/metric).
@@ -122,6 +123,26 @@ python inference_IMAGdressing_controlnetinpainting.py --cloth_path [your cloth p
 ```sh
 python inference_IMAGdressing_counterfeit-v30.py --cloth_path [your cloth path] --model_path [your model path]
 ```
+
+
+## 🤗Gradio interface 🤗
+
+We also provide a Gradio <a href='https://github.com/gradio-app/gradio'><img src='https://img.shields.io/github/stars/gradio-app/gradio'></a> interface for a better experience, just run by:
+
+
+```bash
+pip install modelscope==1.15.0
+pip install mmcv-full==1.7.2
+pip install mmdet==2.26.0
+
+python app.py  --model_weight $MODEL PATH --server_port  7860
+```
+
+You can specify the `--server_port` arguments to satisfy your needs!
+
+
+**Or, try it out effortlessly on [HuggingFace](https://huggingface.co/spaces/feishen29/IMAGDressing-v1) 🤗**
+
 
 ## 📚 Get Involved
 Join us on this exciting journey to transform virtual dressing systems. Star⭐️ our repository to stay updated with the latest advancements, and contribute to making **IMAGDressing** the leading solution for virtual dressing generation.
