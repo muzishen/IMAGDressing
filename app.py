@@ -42,7 +42,7 @@ parser = argparse.ArgumentParser(description='IMAGDressing-v1')
 parser.add_argument('--if_ipa', type=bool, default=True)
 parser.add_argument('--if_control', type=bool, default=True)
 parser.add_argument('--model_weight', type=str, required=True)
-
+parser.add_argument('--server_port', type=int, required=True)
 args = parser.parse_args()
 
 
@@ -253,15 +253,15 @@ def dress_process(garm_img, face_img, pose_img, prompt, cloth_guidance_scale, ca
     return output[0]
 
 
-example_path = os.path.join(os.path.dirname(__file__), 'example')
+example_path = os.path.join(os.path.dirname(__file__), 'assets')
 
-garm_list = os.listdir(os.path.join(example_path,"cloth"))
-garm_list_path = [os.path.join(example_path,"cloth",garm) for garm in garm_list]
+garm_list = os.listdir(os.path.join(example_path,"images"))
+garm_list_path = [os.path.join(example_path,"garment",garm) for garm in garm_list]
 
-face_list = os.listdir(os.path.join(example_path,"face"))
+face_list = os.listdir(os.path.join(example_path,"images"))
 face_list_path = [os.path.join(example_path,"face",face) for face in face_list]
 
-pose_list = os.listdir(os.path.join(example_path,"pose"))
+pose_list = os.listdir(os.path.join(example_path,"images"))
 pose_list_path = [os.path.join(example_path,"pose",pose) for pose in pose_list]
 
 def process_image(image):
@@ -355,4 +355,4 @@ with image_blocks as demo:
     try_button.click(fn=dress_process, inputs=[garm_img, imgs, pose_img, prompt, cloth_guidance_scale, caption_guidance_scale, face_guidance_scale, self_guidance_scale, cross_guidance_scale, is_checked_face, is_checked_postprocess, is_checked_pose, denoise_steps, seed],
                      outputs=[image_out], api_name='IMAGDressing-v1')
 
-image_blocks.launch()
+image_blocks.launch(server_port=args.server_port)  #
