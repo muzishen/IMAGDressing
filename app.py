@@ -14,7 +14,7 @@ from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 import diffusers
 
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
-from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0
+from adapter.attention_processor import CacheAttnProcessor2_0, RefSAttnProcessor2_0, LoRAIPAttnProcessor2_0, RefLoraSAttnProcessor2_0
 from diffusers import ControlNetModel, UNet2DConditionModel, \
     AutoencoderKL, DDIMScheduler
 from adapter.resampler import Resampler
