@@ -212,7 +212,7 @@ def dress_process(garm_img, face_img, pose_img, prompt, cloth_guidance_scale, ca
         steps_offset=1,
     )
 
-    pipe = PipIpaControlNet(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
+    pipe = IMAGDressing_v1(unet=unet, reference_unet=ref_unet, vae=vae, tokenizer=tokenizer,
                             text_encoder=text_encoder, image_encoder=image_encoder,
                             ip_ckpt='./ckpt/ip-adapter-faceid-plus_sd15.bin',
                             ImgProj=image_proj, controlnet=control_net_openpose,
