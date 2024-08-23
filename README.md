@@ -2,6 +2,7 @@
 
 
 ## 📦️ Release
+- [2024/08/23] 🔥 We have made the IGPair dataset publicly available for download: [IGPair Dataset on Hugging Face](https://huggingface.co/datasets/IMAGDressing/IGPair).
 - [2024/07/30] 🔥 We release the [WebUI Code](https://github.com/muzishen/IMAGDressing/blob/main/app.py) for gradio interface.
 - [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
 - [2024/07/19] 🔥 We release the [code](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_cartoon_style.py) and [examples](https://github.com/muzishen/IMAGDressing/blob/main/assets/cartoon.png) for cartoon-style virtual dressing.
@@ -177,7 +178,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [ ] Model weights (More higher sized version)
 - [x] Paper
 - [x] Evaluate metric code
-- [ ] IGPair dataset
+- [x] IGPair dataset
 - [ ] Training code
 - [ ] Video Dressing
 - [ ] Others, such as User-Needed Requirements
