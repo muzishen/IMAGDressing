@@ -20,7 +20,9 @@
 <a href='https://imagdressing.github.io/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
 <a href='http://arxiv.org/abs/2407.12705'><img src='https://img.shields.io/badge/Technique-Report-red'></a>
 <a href='https://huggingface.co/feishen29/IMAGDressing'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue'></a>
+<a href='https://huggingface.co/datasets/IMAGDressing/IGPair'><img src='https://img.shields.io/badge/Dataset-IGPair-orange'></a>
 [![GitHub stars](https://img.shields.io/github/stars/muzishen/IMAGDressing?style=social)](https://github.com/muzishen/IMAGDressing)
+
 
 
 ### 🚀 **Key Features:**
@@ -31,7 +33,8 @@
 
 
 
-
+## 🔥 **Dataset Demo**
+![Dataset Demo](assets/dataset_demo.png)
 
 ## 🔥 **Examples**
 
