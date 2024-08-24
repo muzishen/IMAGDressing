@@ -167,7 +167,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 ```bibtex
 @article{shen2024IMAGDressing-v1,
   title={IMAGDressing-v1: Customizable Virtual Dressing},
-  author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Du, Xiaoyu, Li Zechao, and Tang, Jinghui},
+  author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Du, Xiaoyu, Li Zechao, and Tang, Jinhui},
   booktitle={arXiv preprint arXiv:2407.12705},
   year={2024}
 }
