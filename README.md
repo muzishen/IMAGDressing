@@ -2,6 +2,7 @@
 
 
 ## 📦️ Release
+- [2024/08/24] 🔥 We add the [train code](https://github.com/muzishen/IMAGDressing/blob/main/train.py), Feel free to give it a try!
 - [2024/08/23] 🔥 We release the [IGPair dataset](https://huggingface.co/datasets/IMAGDressing/IGPair) publicly available for download.
 - [2024/07/30] 🔥 We release the [WebUI Code](https://github.com/muzishen/IMAGDressing/blob/main/app.py) for gradio interface.
 - [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
@@ -94,7 +95,14 @@ You can download our models from [HuggingFace](https://huggingface.co/feishen29/
 - [SG161222/Realistic_Vision_V4.0_noVAE](https://huggingface.co/SG161222/Realistic_Vision_V4.0_noVAE).
 - [h94/IP-Adapter-FaceID](https://huggingface.co/h94/IP-Adapter-FaceID).
 - [lllyasviel/control_v11p_sd15_openpose](https://huggingface.co/lllyasviel/control_v11p_sd15_openpose).
-## 🎉 How to Use
+
+## 🎉 How to Train
+```sh
+# Please download the IGPair data first and modify the path in run.sh
+sh run.sh
+```
+
+## 🎉 How to Test
 
 ### <span style="color:red">Important Reminder</span>
 
@@ -182,7 +190,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 - [x] Paper
 - [x] Evaluate metric code
 - [x] IGPair dataset
-- [ ] Training code
+- [x] Training code
 - [ ] Video Dressing
 - [ ] Others, such as User-Needed Requirements
 
