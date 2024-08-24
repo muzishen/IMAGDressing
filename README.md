@@ -2,7 +2,7 @@
 
 
 ## 📦️ Release
-- [2024/08/24] 🔥 We add the [train code](https://github.com/muzishen/IMAGDressing/blob/main/train.py), Feel free to give it a try!
+- [2024/08/24] 🔥 We add the [train code](https://github.com/muzishen/IMAGDressing/blob/main/train.py), feel free to give it a try!
 - [2024/08/23] 🔥 We release the [IGPair dataset](https://huggingface.co/datasets/IMAGDressing/IGPair) publicly available for download.
 - [2024/07/30] 🔥 We release the [WebUI Code](https://github.com/muzishen/IMAGDressing/blob/main/app.py) for gradio interface.
 - [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
