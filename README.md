@@ -2,7 +2,7 @@
 
 
 ## 📦️ Release
-- [2024/08/23] 🔥 We release the IGPair dataset publicly available for download: [IGPair Dataset on Hugging Face](https://huggingface.co/datasets/IMAGDressing/IGPair).
+- [2024/08/23] 🔥 We release the [IGPair dataset](https://huggingface.co/datasets/IMAGDressing/IGPair) publicly available for download.
 - [2024/07/30] 🔥 We release the [WebUI Code](https://github.com/muzishen/IMAGDressing/blob/main/app.py) for gradio interface.
 - [2024/07/26] 🔥 We release the [online webui]( https://huggingface.co/spaces/feishen29/IMAGDressing-v1)，thanks to [ZeroGPU](https://huggingface.co/zero-gpu-explorers) for providing free A100 GPUs. And the original [Gradio_demo](https://sf.dictdoc.site/)  is soon to be deprecated. 
 - [2024/07/19] 🔥 We release the [code](https://github.com/muzishen/IMAGDressing/blob/main/inference_IMAGdressing_cartoon_style.py) and [examples](https://github.com/muzishen/IMAGDressing/blob/main/assets/cartoon.png) for cartoon-style virtual dressing.
@@ -167,7 +167,7 @@ If you find IMAGDressing-v1 useful for your research and applications, please ci
 ```bibtex
 @article{shen2024IMAGDressing-v1,
   title={IMAGDressing-v1: Customizable Virtual Dressing},
-  author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Du, Xiaoyu, Li Zechao, and Tang, Jinghui},
+  author={Shen, Fei and Jiang, Xin and He, Xin and Ye, Hu and Wang, Cong, and Du, Xiaoyu, Li Zechao, and Tang, Jinhui},
   booktitle={arXiv preprint arXiv:2407.12705},
   year={2024}
 }
