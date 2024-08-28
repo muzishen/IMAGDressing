@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
 from adapter.resampler import Resampler
-from IGPair import TryOnDataset, collate_fn
+from IGPair import VDDataset, collate_fn
 from adapter.attention_processor import CacheAttnProcessor2_0,  CAttnProcessor2_0, RefSAttnProcessor2_0
 
 logger = get_logger(__name__)
@@ -406,7 +406,7 @@ def main():
         timestep_spacing="trailing", prediction_type="epsilon",
     )
 
-    dataset = TryOnDataset(
+    dataset = VDDataset(
         [
             args.dataset_json_path,
         ],
