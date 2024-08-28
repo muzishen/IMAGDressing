@@ -9,7 +9,7 @@ from transformers import CLIPImageProcessor
 from random import choice
 
 
-class TryOnDataset(Dataset):
+class VDDataset(Dataset):
     def __init__(
             self,
             json_file,
