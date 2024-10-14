@@ -35,6 +35,8 @@
 
 
 ## 🔥 **Dataset Demo**
+You can download the dataset from [Baidu Cloud](https://pan.baidu.com/s/1y-VnKWgHHCPV5M4zQUmn7g?pwd=IMAG) or [Huggingface Dataset](https://huggingface.co/datasets/IMAGDressing/IGPair). By requesting access, you agree to use the data only for academic and personal purposes and not for commercial use.
+
 ![Dataset Demo](assets/dataset_demo.png)
 
 ## 🔥 **Examples**
