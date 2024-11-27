@@ -375,7 +375,7 @@ def main():
     image_encoder.requires_grad_(False)
     image_proj.requires_grad_(True)
     ref_unet.requires_grad_(True)
-
+    adapter_modules.requires_grad_(True)
     sd_model = SDModel(unet, ref_unet, image_proj, adapter_modules)
 
 
