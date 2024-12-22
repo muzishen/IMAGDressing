@@ -1,8 +1,6 @@
 # **👔IMAGDressing👔: Interactive Modular Apparel Generation for Virtual Dressing**
 
-微信讨论群：
 
-![Group](assets/wx_group1.jpg)
 
 ## 📦️ Release
 - [2024/12/10] 🔥 IMAGDressing-v1 is accepted by AAAI 2025.
