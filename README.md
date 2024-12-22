@@ -1,6 +1,5 @@
 # **👔IMAGDressing👔: Interactive Modular Apparel Generation for Virtual Dressing**
-微信讨论群：
-![Group](assets/wx_group.jpg)
+
 
 ## 📦️ Release
 - [2024/08/24] 🔥 We add the [train code](https://github.com/muzishen/IMAGDressing/blob/main/train.py), feel free to give it a try!
