@@ -3,7 +3,7 @@
 
 
 ## 📦️ Release
-- [2025/5/30]  🔥 The supplementary materials for IMAGDressing-v1 are available [here](https://github.com/muzishen/IMAGDressing/blob/main/assets/AAAI2025_IMAGDressing_v1_supp.pdf).
+- [2025/05/30]  🔥 The supplementary materials for IMAGDressing-v1 are available [here](https://github.com/muzishen/IMAGDressing/blob/main/assets/AAAI2025_IMAGDressing_v1_supp.pdf).
 - [2024/12/10] 🔥 IMAGDressing-v1 is accepted by AAAI 2025.
 - [2024/08/24] 🔥 We add the [train code](https://github.com/muzishen/IMAGDressing/blob/main/train.py), feel free to give it a try!
 - [2024/08/23] 🔥 We release the [IGPair dataset](https://huggingface.co/datasets/IMAGDressing/IGPair) publicly available for download.
